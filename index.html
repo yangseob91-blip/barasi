@@ -399,9 +399,12 @@ const SCH=()=>DAY().sch;
 const R=()=>P.roles.find(r=>r.id===role)||P.roles[0];
 const done=()=>doneBy[day]||(doneBy[day]=new Set());
 const delay=()=>delayBy[day]||0;
-const castNo=id=>(P.roles.find(r=>r.id===id)||{}).n;
+const castNo=id=>((P.roles.find(r=>r.id===id)||{}).name||'').replace(' 역','');
+const skn=sc=>'S#'+parseInt(String(sc).replace('S#',''));
+const sk=sc=>SCRIPT[sc]?sc:(SCRIPT[skn(sc)]?skn(sc):'');
+const DNL={D:'낮',N:'밤',E:'저녁',M:'새벽'};
 const isMine=x=>!R().actor||x.cast.includes(role);
-const callOf=id=>DAY().calls[id]||DAY().calls.all;
+const callOf=id=>(DAY().calls||{})[id]||(DAY().calls||{}).all||'미정';
 
 function renderTop(){
   const d=DAY();
@@ -422,16 +425,17 @@ function renderCall(){
   const notes=d.notes||{};
   $('call').innerHTML=`<div class="lbl">${role==='all'?'전체 콜타임':esc(r.name)+' 콜타임'}</div>
   <div class="big">${esc(callOf(role))}${old?`<span class="old">${esc(old)}</span>`:''}</div>
-  <div class="w">${esc(who)}</div>${notes[role]?`<div class="note">${esc(notes[role])}</div>`:''}
-  <div class="facts"><div>날씨<b>${esc(d.weather||'-')}</b></div><div>전체 콜<b>${esc(d.calls.all)}</b></div><div>일출<b>${esc(d.rise||'-')}</b></div><div>일몰<b>${esc(d.set||'-')}</b></div></div>`;
+  <div class="w">${esc(who)}</div>${P.rough?'<div class="note">러프 회차표 기준이에요. 콜타임과 시간은 일촬표가 확정되면 채워져요.</div>':''}${d.prep?`<div class="note">준비: ${esc(d.prep)}</div>`:''}${notes[role]?`<div class="note">${esc(notes[role])}</div>`:''}
+  ${d.weather?`<div class="facts"><div>날씨<b>${esc(d.weather)}</b></div><div>전체 콜<b>${esc(callOf('all'))}</b></div><div>일출<b>${esc(d.rise||'-')}</b></div><div>일몰<b>${esc(d.set||'-')}</b></div></div>`:''}`;
 }
 function renderList(){
   const r=R(),dn=done(),dl=delay(),sunset=DAY().set?toM(DAY().set):9999;let shots=0,fin=0;
   $('list').innerHTML=SCH().map((x,i)=>{
     const isDone=dn.has(i),sh=(!isDone&&i>0)?dl:0;
-    const s=toM(x.s)+sh,e=x.e?toM(x.e)+sh:0;
-    const old=x.os?`<s>${esc(x.os)}</s>`:(sh?`<s>${esc(x.s)}</s>`:'');
-    if(x.brk)return `<li class="row brk"><div class="rmain"><span class="tm">${toT(s)}</span><span class="tx">${esc(x.t)}</span></div></li>`;
+    const s=x.s?toM(x.s)+sh:0,e=x.e?toM(x.e)+sh:0;
+    const old=x.os?`<s>${esc(x.os)}</s>`:(sh&&x.s?`<s>${esc(x.s)}</s>`:'');
+    const tmT=x.s?toT(s):(DNL[x.dn]||x.dn||'-');
+    if(x.brk)return `<li class="row brk"><div class="rmain"><span class="tm">${tmT}</span><span class="tx">${esc(x.t)}</span></div></li>`;
     shots++;if(isDone)fin++;
     const cast=x.cast||[],mine=r.actor&&cast.includes(role),open=openRow===i;
     const cls=['row',isDone?'done':'',(r.actor&&!mine)?'dim':''].join(' ');
@@ -440,11 +444,11 @@ function renderList(){
     const note=notes[role]?`<div class="dn">${esc(r.name)}: ${esc(notes[role])}</div>`:'';
     const warn=x.sunset&&!isDone&&e>sunset?`<p class="warn">일몰 ${esc(DAY().set)} 이후로 밀렸어요. 노을 씬이 위험해요.</p>`:'';
     return `<li class="${cls}"><div class="rw">
-      <button class="rmain" data-row="${i}" aria-expanded="${open}"><span class="tm">${toT(s)}${old}</span>
-      <span class="tx"><b>${esc(x.sc)} ${esc(x.set)}${x.os?'<span class="tag rv">수정</span>':''}${mine?'<span class="tag me">내 씬</span>':''}</b><small>${esc(x.code)}, 출연 ${cast.map(castNo).join(', ')}, ${toT(e)}까지</small></span></button>
+      <button class="rmain" data-row="${i}" aria-expanded="${open}"><span class="tm">${tmT}${old}</span>
+      <span class="tx"><b>${esc(x.sc)} ${esc(x.set)}${x.os?'<span class="tag rv">수정</span>':''}${mine?'<span class="tag me">내 씬</span>':''}</b><small>${esc([x.code,cast.length?'출연 '+cast.map(castNo).join(', '):'',e?toT(e)+'까지':''].filter(Boolean).join(', '))}</small></span></button>
       <button class="chk" data-i="${i}" aria-pressed="${isDone}" aria-label="${esc(x.sc)} 촬영 완료"><span></span></button></div>
       <div class="more" ${open?'':'hidden'}><p>${esc(x.d||'')}</p>${note}${warn}
-      <div class="acts"><button class="btn" data-script="${esc(x.sc)}" ${SCRIPT[x.sc]?'':'disabled'}>대본 보기</button><button class="btn" data-files="${esc(x.sc)}">자료 ${nf}</button></div></div></li>`;
+      <div class="acts"><button class="btn" data-script="${esc(x.sc)}" ${sk(x.sc)?'':'disabled'}>대본 보기</button><button class="btn" data-files="${esc(x.sc)}">자료 ${nf}</button></div></div></li>`;
   }).join('');
   $('pbar').style.width=(shots?fin/shots*100:0)+'%';
   $('ptxt').textContent=`${shots}씬 중 ${fin}씬 완료`;
@@ -455,7 +459,7 @@ function renderDays(){
   const past=P.list.filter(([n])=>n<P.today).length;
   $('dsum').innerHTML=`<div>전체<b>${P.total}</b></div><div>완료<b>${past}</b></div><div>남음<b>${P.total-past}</b></div>`;
   $('days').innerHTML=P.list.map(([n,dt,loc])=>{
-    const st=n<P.today?'past':n===P.today?'today':'next';
+    const st=n<P.today?'past':(n===P.today&&P.isToday)?'today':'next';
     const label=st==='past'?'완료':st==='today'?'오늘':'예정';
     return `<li class="${st}${n===day?' on':''}"><button data-day="${n}"><span class="no">${n}</span><span class="tx"><b>${esc(dt)}</b><small>${esc(loc)}</small></span><span class="st">${label}</span></button></li>`;
   }).join('');
@@ -463,7 +467,7 @@ function renderDays(){
 function renderScenes(){
   $('scriptCap').textContent=`${day}회차 씬이에요. 누르면 그 장면 대본이 열려요`;
   const sc=SCH().filter(x=>x.sc&&(!mineOnly||isMine(x)));
-  $('slist').innerHTML=sc.length?sc.map(x=>`<li><button data-script="${esc(x.sc)}" ${SCRIPT[x.sc]?'':'disabled'}><span class="no">${esc(x.sc.replace('S#',''))}</span><span class="tx"><b>${esc(x.set)}</b><small>${esc(x.code)}, ${esc(x.s)}${SCRIPT[x.sc]?'':', 대본 없음'}</small></span><span class="go"></span></button></li>`).join(''):`<li class="empty">이 회차엔 해당 씬이 없어요.</li>`;
+  $('slist').innerHTML=sc.length?sc.map(x=>`<li><button data-script="${esc(x.sc)}" ${sk(x.sc)?'':'disabled'}><span class="no">${esc(x.sc.replace('S#',''))}</span><span class="tx"><b>${esc(x.set)}</b><small>${esc([x.code,x.d,x.s].filter(Boolean).join(', '))}${sk(x.sc)?'':', 대본 없음'}</small></span><span class="go"></span></button></li>`).join(''):`<li class="empty">이 회차엔 해당 씬이 없어요.</li>`;
   const cur=$('fileScene').value;
   $('fileScene').innerHTML='<option value="">공통</option>'+SCH().filter(x=>x.sc).map(x=>`<option value="${esc(x.sc)}">${esc(x.sc)} ${esc(x.set)}</option>`).join('');
   $('fileScene').value=cur&&[...$('fileScene').options].some(o=>o.value===cur)?cur:'';
@@ -474,7 +478,7 @@ function renderContact(){
   $('locDl').innerHTML=(d.info||[]).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   const q=encodeURIComponent(d.q||d.loc);
   $('maps').innerHTML=`<a href="https://map.naver.com/p/search/${q}">네이버 지도</a><a href="https://map.kakao.com/?q=${q}">카카오맵</a>`;
-  $('people').innerHTML=(P.crew||[]).map(c=>`<li><span><b>${esc(c.n)}</b><small>${esc(c.r)}, ${esc(c.tel)}</small></span><a href="tel:${esc(c.tel)}">전화</a></li>`).join('');
+  $('people').innerHTML=(P.crew||[]).map(c=>`<li><span><b>${esc(c.n)}</b><small>${esc(c.r)}, ${esc(c.tel)}</small></span><a href="tel:${esc(c.tel)}">전화</a></li>`).join('')||'<li class="empty">아직 연락망이 없어요. 제작부가 올리면 여기 보여요.</li>';
 }
 const isImg=f=>/^image\//.test(f.mime||'')&&f.url;
 function thumb(f,i){
@@ -490,7 +494,7 @@ function closeSheet(){if($('sheet').hidden)return;$('sheet').hidden=true;if(last
 function pickRole(){openSheet('누구 기준으로 볼까요',`<ul class="pick">${P.roles.map(r=>`<li><button data-pick="${esc(r.id)}" aria-current="${r.id===role}"><span>${esc(r.name)}</span><small>콜 ${esc(callOf(r.id))}</small></button></li>`).join('')}</ul>
   <div class="proj"><span><small>프로젝트 번호</small><b>${esc(code)}</b></span><button data-logout>나가기</button></div><p class="by">made by 양섭</p>${standalone?'':'<button class="btn pri go" style="width:100%;margin-top:12px" data-install>홈 화면에 앱으로 설치하기</button>'}`)}
 function showScript(sc){
-  const p=SCRIPT[sc];if(!p)return;const me=R().actor?R().name.replace(' 역',''):'';
+  const p=SCRIPT[sk(sc)];if(!p)return;const me=R().actor?R().name.replace(' 역',''):'';
   openSheet(sc+' 대본',`<div class="page"><p class="h">${esc(p.h)}</p>${p.l.map(x=>x.k==='a'?`<p class="a">${esc(x.t)}</p>`:`<div class="d ${me&&x.c===me?'mine':''}"><b>${esc(x.c)}</b><span>${x.p?`<i>(${esc(x.p)})</i>`:''}${esc(x.t)}</span></div>`).join('')}</div>`);
 }
 function showFiles(sc){
@@ -533,6 +537,7 @@ function apply(b,keepView){
   P=b;code=b.code;SCRIPT=b.scripts||{};
   doneBy={};delayBy={};
   for(const [k,v] of Object.entries(b.state||{})){doneBy[k]=new Set(v.done||[]);delayBy[k]=v.delay||0}
+  if(P.list&&P.list.length&&P.list[0][3]){const t=new Date(Date.now()+9*3600e3).toISOString().slice(0,10);const nx=P.list.find(x=>x[3]>=t);P.today=nx?nx[0]:P.list[P.list.length-1][0];P.isToday=!!nx&&nx[3]===t}else P.isToday=true;
   if(!keepView||!P.days[day])day=P.days[P.today]?P.today:+Object.keys(P.days)[0];
   if(!P.roles.some(r=>r.id===role))role='all';
   store.set('barasi_cache',JSON.stringify(b));
