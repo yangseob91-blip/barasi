@@ -1,6 +1,6 @@
 // 바라시 서비스 워커: 앱 껍데기는 캐시에서 바로 띄우고, 새 버전은 뒤에서 받아둔다.
 // 화면을 고친 뒤 배포할 때는 VERSION 숫자만 올리면 된다.
-const VERSION = 'barasi-v5';
+const VERSION = 'barasi-v6';
 const SHELL = [
   './',
   './index.html',
