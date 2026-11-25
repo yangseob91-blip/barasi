@@ -1110,8 +1110,8 @@ TT.fromPdf=async(pdf,maxPages=12)=>{
     const rows=new Map();
     for(const it of tc.items){if(!it.str||!it.str.trim())continue;const y=Math.round(it.transform[5]);let k=[...rows.keys()].find(v=>Math.abs(v-y)<=2);if(k===undefined){k=y;rows.set(k,[])}rows.get(k).push({x:it.transform[4],w:Math.max(it.width,it.str.length*2),s:it.str,h:Math.abs(it.transform[3])||10})}
     for(const [y,its] of rows){its.sort((a,b)=>a.x-b.x);const segs=[];let cur=null;
-      for(const it of its){const gap=cur?it.x-cur.x1:99;if(cur&&gap<Math.max(5,it.h*0.6)){cur.t+=(gap>1.2?' ':'')+it.s;cur.x1=Math.max(cur.x1,it.x+it.w)}else{cur={x0:it.x,x1:it.x+it.w,t:it.s};segs.push(cur)}}
-      segs.forEach(s=>s.t=TT.norm(s.t));lines.push({pg:pn,y:(pn-1)*10000+(H-y),segs:segs.filter(s=>s.t)})}
+      for(const it of its){const gap=cur?it.x-cur.x1:99;if(cur&&gap<Math.max(5,it.h*0.6)){cur.t+=(gap>0.35&&!/\s$/.test(cur.t)&&!/^\s/.test(it.s)?' ':'')+it.s;cur.last=it.s;cur.x1=Math.max(cur.x1,it.x+it.w)}else{cur={x0:it.x,x1:it.x+it.w,t:it.s,last:it.s};segs.push(cur)}}
+      segs.forEach(s=>{s.t=TT.norm(s.t);delete s.last});lines.push({pg:pn,y:(pn-1)*10000+(H-y),segs:segs.filter(s=>s.t)})}
   }
   return lines.filter(l=>l.segs.length).sort((a,b)=>a.y-b.y);
 };
@@ -1290,7 +1290,7 @@ TT.meta=(out,metaLines,lines)=>{
   // 전화 없는 파트 줄 (촬영 조병훈, 황민형 …)
   for(const l of metaLines){const s=l.segs;if(s.length>=2&&TT.ROLEW.test(TT.key(s[0].t))&&!TT.PHONE.test(s.map(x=>x.t).join(' '))&&s.length<=4){TT.PHONE.lastIndex=0;M.staff=(M.staff?M.staff+' / ':'')+s[0].t+': '+s.slice(1).map(x=>x.t).join(' ')}TT.PHONE.lastIndex=0}
   // 공지·변동 문구
-  for(const s of all){if(/변동|변경될|가안|대외비|유의|주의/.test(s)&&s.length<120&&!out.notes.includes(s))out.notes.push(s.replace(/^[•·\-]\s*/,''))}
+  for(const s of metaLines.map(l=>l.segs.map(x=>x.t).join(' '))){if(/변동|변경될|가안|대외비|유의|주의/.test(s)&&s.length<120&&!out.notes.includes(s))out.notes.push(s.replace(/^[•·\-]\s*/,''))}
 };
 
 /* ---------- 4. 앱 회차 데이터로 ---------- */
