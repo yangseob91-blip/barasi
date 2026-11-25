@@ -177,6 +177,33 @@ main{max-width:560px;margin:0 auto;padding:4px 16px calc(110px + env(safe-area-i
 .upw{color:var(--coral);font-size:13px;margin:0 0 10px}
 .upo{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:0 0 14px}
 .upo input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--blue)}
+.ebar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--blue);color:#fff;border-radius:14px;padding:10px 14px;margin:0 0 12px;font-size:13px}
+.ebar b{margin-right:6px}.ebar button{flex:none;background:rgba(255,255,255,.2);color:#fff;border-radius:10px;padding:6px 12px;font-weight:700;font-size:13px}
+.edb{width:100%;margin-top:14px;background:var(--bluebg);color:var(--blue)}
+.eacts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.eacts .btn{min-height:36px;padding:0 12px;font-size:13px;background:var(--bluebg);color:var(--blue)}
+.eacts .btn:disabled{opacity:.35}
+.row.brk .eacts{padding:0 0 10px}
+li.eadd{display:flex;gap:8px;padding:12px 0 2px;list-style:none;border:0}
+li.eadd .btn{flex:1;background:var(--bluebg);color:var(--blue)}
+.edp{flex:none;margin-left:8px;min-height:34px;font-size:13px;background:var(--bluebg);color:var(--blue)}
+.edtog{width:100%;margin-top:12px;background:var(--bluebg);color:var(--blue);min-height:48px;border-radius:14px}
+.edf{display:flex;flex-direction:column;gap:12px}
+.ef{display:block}.ef>span{display:block;font-size:13px;color:var(--sub);margin-bottom:5px;font-weight:500}
+.ef small{display:block;color:var(--sub);font-size:12px;margin-top:4px}
+.edf input[type=text],.edf input[type=tel],.edf input[type=time],.edf input[type=date],.edf select,.edf textarea{width:100%;font:inherit;font-size:16px;border:0;background:var(--soft);border-radius:12px;padding:11px 12px;color:inherit;min-height:46px}
+.edf textarea{resize:vertical;line-height:1.5}
+.edf input:focus,.edf select:focus,.edf textarea:focus{outline:2px solid var(--blue);outline-offset:0}
+.ef2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ef3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px}
+.ed-more{background:var(--soft);border-radius:12px;padding:10px 12px}.ed-more summary{font-size:14px;font-weight:700;cursor:pointer}
+.ed-more .ef{margin-top:10px}.ed-more input{background:var(--card)!important}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips label{position:relative}
+.chips input{position:absolute;opacity:0;width:1px;height:1px}
+.chips span{display:inline-block;padding:8px 12px;border-radius:999px;background:var(--soft);font-size:14px;font-weight:500}
+.chips input:checked+span{background:var(--blue);color:#fff}.chips input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.eacts2{display:flex;gap:8px;margin-top:14px}.eacts2 .btn{flex:1}
+.btn.warn{color:var(--coral);background:var(--coralbg)}.warnbg{background:var(--coral)!important}
+.rrow{display:flex;align-items:center;gap:8px}.rrow input{flex:1}.rrow span{font-size:12px;color:var(--sub);width:30px}
+.rrow .x{width:32px;height:32px;border-radius:50%;background:var(--coralbg);color:var(--coral);font-size:18px;flex:none}
 
 /* 자료 */
 .field{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;font-size:14px;color:var(--sub)}
@@ -504,7 +531,7 @@ let lastFocus=null;
 function openSheet(t,html){lastFocus=document.activeElement;$('shT').textContent=t;$('shB').innerHTML=html;$('sheet').hidden=false;$('shB').scrollTop=0;$('shX').focus()}
 function closeSheet(){if($('sheet').hidden)return;$('sheet').hidden=true;if(lastFocus&&lastFocus.isConnected)lastFocus.focus()}
 function pickRole(){openSheet('누구 기준으로 볼까요',`<ul class="pick">${P.roles.map(r=>`<li><button data-pick="${esc(r.id)}" aria-current="${r.id===role}"><span>${esc(r.name)}</span><small>콜 ${esc(callOf(r.id))}</small></button></li>`).join('')}</ul>
-  <div class="proj"><span><small>프로젝트 번호</small><b>${esc(code)}</b></span><button data-logout>나가기</button></div><p class="by">made by 양섭</p>${standalone?'':'<button class="btn pri go" style="width:100%;margin-top:12px" data-install>홈 화면에 앱으로 설치하기</button>'}`)}
+  <div class="proj"><span><small>프로젝트 번호</small><b>${esc(code)}</b></span><button data-logout>나가기</button></div><button class="btn go edtog" data-e="toggle">${editMode?'제작부 모드 끄기':'제작부 모드 켜기 (수정하기)'}</button><p class="by">made by 양섭</p>${standalone?'':'<button class="btn pri go" style="width:100%;margin-top:12px" data-install>홈 화면에 앱으로 설치하기</button>'}`)}
 function showScript(sc){
   const p=SCRIPT[sk(sc)];if(!p)return;const me=R().actor?R().name.replace(' 역',''):'';
   openSheet(sc+' 대본',`<div class="page"><p class="h">${esc(p.h)}</p>${p.l.map(x=>x.k==='a'?`<p class="a">${esc(x.t)}</p>`:`<div class="d ${me&&x.c===me?'mine':''}"><b>${esc(x.c)}</b><span>${x.p?`<i>(${esc(x.p)})</i>`:''}${esc(x.t)}</span></div>`).join('')}</div>`);
@@ -601,7 +628,7 @@ async function delFile(i,inSheet){
 
 /* 입장 */
 function showGate(){$('gate').hidden=false;$('gCode').value='';$('gPw').value='';$('gErr').textContent='';setTimeout(()=>$('gCode').focus(),50)}
-function logout(silent){isAdmin=false;
+function logout(silent){isAdmin=false;editMode=false;store.del('barasi_admin');
   if(token&&!silent)rpc('barasi_logout',{p_token:token}).catch(()=>{});
   token='';store.del('barasi_token');store.del('barasi_cache');FILES=[];filesLoaded=false;P=null;
   closeSheet();showGate();
@@ -726,7 +753,7 @@ function askAdmin(){
     f.addEventListener('submit',async ev=>{ev.preventDefault();
       if(inp.value.length!==6){$('pinErr').textContent='숫자 6자리를 입력하세요.';return}
       const btn=f.querySelector('button');btn.disabled=true;btn.textContent='확인하는 중…';
-      try{await rpc('barasi_admin',{p_token:token,p_pw:inp.value});isAdmin=true;res(true)}
+      try{await rpc('barasi_admin',{p_token:token,p_pw:inp.value});isAdmin=true;store.set('barasi_admin',token);res(true)}
       catch(err){$('pinErr').textContent=err.net?'인터넷 연결을 확인해 주세요.':/too_many/.test(err.message)?'여러 번 틀려서 잠겼어요. 10분 뒤에 다시 시도해 주세요.':'제작부 비밀번호가 맞지 않아요.';inp.value='';inp.focus();btn.disabled=false;btn.textContent='확인'}
     });
     const obs=setInterval(()=>{if($('sheet').hidden){clearInterval(obs);res(false)}},400);
@@ -753,13 +780,13 @@ async function saveUp(){
     SCRIPT=rep?Object.assign({},p):Object.assign({},SCRIPT,p);upPending=null;renderList();renderScenes();
     openSheet('대본 올리기',`<p>씬 ${n}개를 저장했어요. 팀 전원에게 바로 보여요.</p>`);
   }catch(err){
-    if(err.server&&/not_admin/.test(err.message)){isAdmin=false;btn.disabled=false;btn.textContent='이 대본으로 저장하기';if(await askAdmin())showUpPreview(p,'대본');return}
+    if(err.server&&/not_admin/.test(err.message)){isAdmin=false;store.del('barasi_admin');btn.disabled=false;btn.textContent='이 대본으로 저장하기';if(await askAdmin())showUpPreview(p,'대본');return}
     btn.disabled=false;btn.textContent='이 대본으로 저장하기';toast(err.net?'인터넷 연결을 확인해 주세요.':'저장하지 못했어요. 다시 시도해 주세요.');
   }
 }
 $('scriptIn').addEventListener('change',async e=>{
   const f=e.target.files[0];e.target.value='';if(!f)return;
-  if(!isAdmin&&!(await askAdmin()))return;
+  if(!isAdmin&&store.get('barasi_admin')!==token&&!(await askAdmin()))return;
   const pdf=/\.pdf$/i.test(f.name)||f.type==='application/pdf';
   openSheet('대본 읽는 중',`<p id="upProg">${pdf?'PDF를 여는 중이에요…':'파일을 읽는 중이에요…'}</p>`);
   try{
@@ -790,6 +817,224 @@ $('sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){refresh();if(filesLoaded)loadFiles(true)}});
 setInterval(refresh,30000);
+
+/* 제작부 수정 모드: 콜시트·회차·씬·연락처를 화면에서 바로 고침 */
+var editMode=false;
+const admOK=()=>isAdmin||(token&&store.get('barasi_admin')===token);
+const WK='일월화수목금토';
+const isoLbl=iso=>{const d=new Date(iso+'T00:00:00');return `${d.getMonth()+1}월 ${d.getDate()}일 ${WK[d.getDay()]}요일`};
+const isoShort=iso=>{const d=new Date(iso+'T00:00:00');return `${d.getMonth()+1}월 ${d.getDate()}일`};
+const tv=v=>/^\d{1,2}:\d{2}$/.test(v||'')?v.padStart(5,'0'):'';
+const nowLbl=()=>{const d=new Date();return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} 변경`};
+function recalcToday(){
+  if(P.list&&P.list.length&&P.list[0][3]){const t=new Date(Date.now()+9*3600e3).toISOString().slice(0,10);const nx=P.list.find(x=>x[3]>=t);P.today=nx?nx[0]:P.list[P.list.length-1][0];P.isToday=!!nx&&nx[3]===t}
+  P.total=P.list.length;
+}
+function rerender(){recalcToday();store.set('barasi_cache',JSON.stringify(P));all()}
+async function withAdmin(fn){
+  if(!admOK()&&!(await askAdmin()))return false;
+  try{await fn();return true}
+  catch(err){
+    if(err.server&&/not_admin/.test(err.message)){isAdmin=false;store.del('barasi_admin');store.del('barasi_admin');if(await askAdmin()){try{await fn();return true}catch(e2){err=e2}}else return false}
+    toast(err.net?'인터넷이 끊겨 저장하지 못했어요. 연결되면 다시 해주세요.':'저장하지 못했어요. 다시 시도해 주세요.');return false;
+  }
+}
+async function saveDays(nums,meta){
+  const days={};for(const n of nums)if(P.days[n])days[n]=P.days[n];
+  saving=true;
+  try{await rpc('barasi_save_days',{p_token:token,p_days:days,p_meta:meta?{roles:P.roles,crew:P.crew||[],list:P.list}:null})}
+  finally{saving=false}
+}
+const save=(nums,meta,msg)=>withAdmin(()=>saveDays(nums,meta)).then(ok=>{if(ok){rerender();if(msg)toast(msg)}return ok});
+// 줄 순서가 바뀌어도 완료 체크가 같은 씬에 남게
+function keepDone(n,fn){
+  const s=P.days[n].sch,dn=doneBy[n]||new Set(),mark=new Set([...dn].map(i=>s[i]).filter(Boolean));
+  fn();
+  const s2=P.days[n].sch,nd=new Set();s2.forEach((x,i)=>{if(mark.has(x))nd.add(i)});doneBy[n]=nd;
+  rpc('barasi_set_state',{p_token:token,p_day:n,p_done:[...nd],p_delay:delayBy[n]||0}).catch(()=>{});
+}
+function ensureDay(n){
+  if(P.days[n])return P.days[n];
+  const it=P.list.find(x=>x[0]===n)||[n,'','',''];
+  return P.days[n]={date:it[3]?isoLbl(it[3]):it[1],iso:it[3]||'',loc:it[2]||'',prep:'',calls:{},notes:{},info:[],q:'',sch:[]};
+}
+function syncList(n){
+  const d=P.days[n],i=P.list.findIndex(x=>x[0]===n);const row=[n,d.iso?isoShort(d.iso):(d.date||''),d.loc||'',d.iso||''];
+  if(i>=0)P.list[i]=row;else{P.list.push(row);P.list.sort((a,b)=>a[0]-b[0])}
+}
+async function toggleEdit(){
+  if(editMode){editMode=false;closeSheet();all();toast('제작부 모드를 껐어요.');return}
+  if(!admOK()&&!(await askAdmin()))return;
+  editMode=true;closeSheet();all();toast('제작부 모드예요. 고친 내용은 바로 팀 전원에게 보여요.');
+}
+const F=(lbl,html,hint)=>`<label class="ef"><span>${lbl}</span>${html}${hint?`<small>${hint}</small>`:''}</label>`;
+const I=(id,v,type='text',ph='')=>`<input id="${id}" type="${type}" value="${esc(v||'')}" placeholder="${esc(ph)}" autocomplete="off">`;
+const T=(id,v,ph='',rows=3)=>`<textarea id="${id}" rows="${rows}" placeholder="${esc(ph)}">${esc(v||'')}</textarea>`;
+const V=id=>($(id)?$(id).value.trim():'');
+
+/* 회차 정보·콜타임 */
+function editDay(n){
+  const d=ensureDay(n);const calls=d.calls||{};
+  const parts=P.roles.filter(r=>r.id!=='all');
+  openSheet(`${n}회차 수정`,`<form class="edf" id="edForm">
+  ${F('날짜',I('eIso',d.iso,'date'))}
+  ${F('장소',I('eLoc',d.loc,'text','예: 연천 전곡 외곽 배추밭'))}
+  ${F('지도 검색어',I('eQ',d.q,'text','비우면 장소로 검색해요'))}
+  ${F('전체 콜타임',I('eCall',calls.all,'time'))}
+  <details class="ed-more"${parts.some(r=>calls[r.id])?' open':''}><summary>파트·배우별 콜타임</summary>
+  ${parts.map(r=>F(esc(r.name),I('eC_'+r.id,calls[r.id],'time'))).join('')}<p class="hint">비워두면 전체 콜타임을 따라가요.</p></details>
+  ${F('준비물',I('ePrep',d.prep,'text','예: 로드킬견2, 두부'))}
+  <div class="ef3">${F('날씨',I('eW',d.weather,'text','맑음 3°'))}${F('일출',I('eRise',d.rise,'time'))}${F('일몰',I('eSet',d.set,'time'))}</div>
+  ${F('현장 정보',T('eInfo',(d.info||[]).map(([k,v])=>k+': '+v).join('\n'),'주차: 마을회관 앞\n화장실: 현장 컨테이너',4),'한 줄에 하나씩, "항목: 내용"으로 적어요')}
+  ${F('변경 공지',T('eRev',d.rev,'예: 비 예보로 S#12를 오후로 옮겼어요',2),'적으면 콜시트 맨 위에 빨간 알림으로 떠요. 지우면 사라져요')}
+  <button class="btn pri go" type="submit">저장하기</button></form>`);
+  $('edForm').addEventListener('submit',async ev=>{ev.preventDefault();
+    const iso=V('eIso');d.iso=iso;if(iso)d.date=isoLbl(iso);
+    d.loc=V('eLoc');d.q=V('eQ');d.prep=V('ePrep');d.weather=V('eW');d.rise=tv(V('eRise'));d.set=tv(V('eSet'));
+    const c={};const all_=tv(V('eCall'));if(all_)c.all=all_;for(const r of parts){const t=tv(V('eC_'+r.id));if(t)c[r.id]=t}
+    const oldAll=(d.calls||{}).all;if(oldAll&&c.all&&oldAll!==c.all){d.old=Object.assign({},d.old||{},{all:oldAll})}if(d.old&&d.old.all===c.all)delete d.old.all;
+    d.calls=c;
+    d.info=V('eInfo').split('\n').map(s=>s.trim()).filter(Boolean).map(s=>{const i=s.search(/[:：]/);return i>0?[s.slice(0,i).trim(),s.slice(i+1).trim()]:['메모',s]});
+    const rev=V('eRev');if(rev!==(d.rev||'')){d.rev=rev;d.revAt=rev?nowLbl():''}
+    syncList(n);
+    if(await save([n],true,'저장했어요.'))closeSheet();
+  });
+}
+
+/* 씬·식사 줄 */
+function rowForm(x,isNew){
+  const actors=P.roles.filter(r=>r.actor);const cast=x.cast||[];
+  if(x.brk)return `<form class="edf" id="rowForm">${F('내용',I('rT',x.t,'text','예: 점심 식사, 장소 이동'))}${F('시작 시간',I('rS',x.s,'time'))}<button class="btn pri go" type="submit">${isNew?'추가하기':'저장하기'}</button></form>`;
+  return `<form class="edf" id="rowForm">
+  <div class="ef2">${F('씬 번호',I('rSc',x.sc,'text','S#12'))}${F('낮·밤',`<select id="rDn">${['','D','N','E','M'].map(k=>`<option value="${k}"${(x.dn||'')===k?' selected':''}>${k?DNL[k]:'선택 안 함'}</option>`).join('')}</select>`)}</div>
+  ${F('장소·세트',I('rSet',x.set,'text','예: 동네 뒷산'))}
+  ${F('내용',I('rD',x.d,'text','예: 로드킬 발견'))}
+  <div class="ef2">${F('시작',I('rS',x.s,'time'))}${F('끝',I('rE',x.e,'time'))}</div>
+  ${!isNew&&x.s?`<label class="upo"><input type="checkbox" id="rOld" checked><span>시간이 바뀌면 이전 시간을 줄 그어 보여주기</span></label>`:''}
+  ${F('출연',`<div class="chips">${actors.map(r=>`<label><input type="checkbox" value="${esc(r.id)}"${cast.includes(r.id)?' checked':''}><span>${esc(r.name.replace(' 역',''))}</span></label>`).join('')}</div>`)}
+  ${F('새 배우 추가',I('rNew','','text','이름을 쓰면 배우 목록에도 추가돼요'))}
+  ${F('코드·컷 정보',I('rCode',x.code,'text','예: 1/8p, C-3'))}
+  ${F('전체 메모',I('rNote',(x.notes||{}).all,'text','팀 전원에게 보이는 메모'))}
+  <label class="upo"><input type="checkbox" id="rSun"${x.sunset?' checked':''}><span>노을·해 지기 전 씬 (일몰 넘기면 경고)</span></label>
+  <button class="btn pri go" type="submit">${isNew?'추가하기':'저장하기'}</button></form>`;
+}
+function readRow(x){
+  if(x.brk){x.t=V('rT')||'휴식';x.s=tv(V('rS'));return}
+  let sc=V('rSc');if(/^\d/.test(sc))sc='S#'+sc;x.sc=sc.replace(/^s\s*#\s*/i,'S#');
+  x.dn=V('rDn');x.set=V('rSet');x.d=V('rD');x.code=V('rCode');
+  const s=tv(V('rS')),e=tv(V('rE'));if(x.s&&s!==x.s&&$('rOld')&&$('rOld').checked)x.os=x.s;if(s===x.os)delete x.os;x.s=s;x.e=e;
+  x.cast=[...document.querySelectorAll('#rowForm .chips input:checked')].map(i=>i.value);
+  const nn=V('rNew');if(nn){const id='a'+Date.now().toString(36);P.roles.push({id,name:nn.replace(/\s*역$/,'')+' 역',who:'',actor:true,n:P.roles.filter(r=>r.actor).length+1});x.cast.push(id)}
+  x.notes=Object.assign({},x.notes||{});const nt=V('rNote');if(nt)x.notes.all=nt;else delete x.notes.all;
+  x.sunset=$('rSun').checked||undefined;
+}
+function editRow(i){
+  const n=day,x=SCH()[i];if(!x)return;const roles0=P.roles.length;
+  openSheet(x.brk?'식사·이동 수정':`${x.sc} 수정`,rowForm(x,false)+`<div class="eacts2"><button class="btn" data-e="move" data-i="${i}">다른 회차로 옮기기</button><button class="btn warn" data-e="del" data-i="${i}">삭제</button></div>`);
+  $('rowForm').addEventListener('submit',async ev=>{ev.preventDefault();const bak=JSON.stringify(x);readRow(x);
+    if(!x.brk&&!/^S#\d/.test(x.sc)){Object.assign(x,JSON.parse(bak));toast('씬 번호를 S#12처럼 적어주세요.');return}
+    if(await save([n],P.roles.length!==roles0,'저장했어요.'))closeSheet();else Object.assign(x,JSON.parse(bak));});
+}
+function addRow(brk){
+  const n=day,x=brk?{brk:true,t:'',s:''}:{sc:'',code:'',dn:'D',set:'',d:'',cast:[],notes:{}};const roles0=P.roles.length;
+  openSheet(brk?'식사·이동 추가':'씬 추가',rowForm(x,true));
+  $('rowForm').addEventListener('submit',async ev=>{ev.preventDefault();readRow(x);
+    if(!x.brk&&!/^S#\d/.test(x.sc)){toast('씬 번호를 S#12처럼 적어주세요.');return}
+    ensureDay(n).sch.push(x);
+    if(await save([n],P.roles.length!==roles0,'추가했어요.'))closeSheet();else SCH().pop();});
+}
+async function moveRow(i,dir){
+  const n=day,s=SCH(),j=i+dir;if(j<0||j>=s.length)return;
+  keepDone(n,()=>{[s[i],s[j]]=[s[j],s[i]]});openRow=j;renderList();
+  await save([n],false);
+}
+function askMove(i){
+  const x=SCH()[i];
+  openSheet(`${x.sc||'이 줄'} 옮기기`,`<p>어느 회차로 옮길까요? 그 회차 맨 끝에 붙어요.</p><ul class="pick">${P.list.filter(([m])=>m!==day).map(([m,dt,loc])=>`<li><button data-e="moveto" data-i="${i}" data-to="${m}"><span>${m}회차, ${esc(dt)}</span><small>${esc(loc||'')}</small></button></li>`).join('')}</ul>`);
+}
+async function moveTo(i,m){
+  const n=day,x=SCH()[i];ensureDay(m);
+  keepDone(n,()=>P.days[n].sch.splice(i,1));P.days[m].sch.push(x);openRow=-1;
+  if(await save([n,m],true,`${m}회차로 옮겼어요.`))closeSheet();
+}
+async function delRow(i){
+  const x=SCH()[i];
+  openSheet('삭제할까요?',`<p><b>${esc(x.brk?x.t:x.sc+' '+(x.set||''))}</b>을(를) ${day}회차에서 뺄게요. 대본은 그대로 남아요.</p><button class="btn pri go warnbg" data-e="delok" data-i="${i}">삭제하기</button>`);
+}
+async function delOk(i){
+  const n=day;keepDone(n,()=>P.days[n].sch.splice(i,1));openRow=-1;
+  if(await save([n],false,'삭제했어요.'))closeSheet();
+}
+
+/* 회차 추가 */
+async function addDay(){
+  const last=P.list[P.list.length-1];const n=(last?last[0]:0)+1;
+  let iso='';if(last&&last[3]){const d=new Date(last[3]+'T00:00:00');d.setDate(d.getDate()+1);iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+  const d=ensureDay(n);d.iso=iso;d.date=iso?isoLbl(iso):'';syncList(n);
+  if(await save([n],true,`${n}회차를 만들었어요.`)){day=n;openRow=-1;all();setTab('today');editDay(n)}
+  else{delete P.days[n];P.list=P.list.filter(x=>x[0]!==n)}
+}
+
+/* 연락처 */
+function editCrew(i){
+  const c=i>=0?P.crew[i]:{n:'',r:'',tel:''};
+  openSheet(i>=0?'연락처 수정':'연락처 추가',`<form class="edf" id="crewForm">${F('이름',I('cN',c.n,'text','홍길동'))}${F('파트·역할',I('cR',c.r,'text','예: 제작부장, 금순 역'))}${F('전화번호',I('cT',c.tel,'tel','010-0000-0000'))}<button class="btn pri go" type="submit">저장하기</button></form>${i>=0?`<div class="eacts2"><button class="btn warn" data-e="crewdel" data-i="${i}">이 연락처 삭제</button></div>`:''}`);
+  $('crewForm').addEventListener('submit',async ev=>{ev.preventDefault();
+    const v={n:V('cN'),r:V('cR'),tel:V('cT')};if(!v.n){toast('이름을 적어주세요.');return}
+    P.crew=P.crew||[];const bak=JSON.stringify(P.crew);if(i>=0)P.crew[i]=v;else P.crew.push(v);
+    if(await save([],true,'저장했어요.'))closeSheet();else P.crew=JSON.parse(bak);});
+}
+async function delCrew(i){const bak=JSON.stringify(P.crew);P.crew.splice(i,1);if(await save([],true,'삭제했어요.'))closeSheet();else P.crew=JSON.parse(bak)}
+
+/* 파트·배우 */
+function editRoles(){
+  const used=new Set();for(const d of Object.values(P.days))for(const x of d.sch||[])for(const c of x.cast||[])used.add(c);
+  openSheet('파트·배우 관리',`<form class="edf" id="roleForm"><p class="hint" style="margin:0 0 10px">이름을 바꾸면 콜시트 전체에 바로 반영돼요.</p>
+  ${P.roles.filter(r=>r.id!=='all').map(r=>`<div class="rrow">${I('rl_'+r.id,r.name.replace(/ 역$/,''))}<span>${r.actor?'배우':'파트'}</span>${used.has(r.id)?'':`<button type="button" class="x" data-e="roledel" data-id="${esc(r.id)}" aria-label="${esc(r.name)} 삭제">×</button>`}</div>`).join('')}
+  <div class="ef2">${F('새 이름',I('rlNew','','text','예: 동시녹음부, 은미'))}${F('종류',`<select id="rlKind"><option value="0">파트</option><option value="1">배우</option></select>`)}</div>
+  <button class="btn pri go" type="submit">저장하기</button></form>`);
+  $('roleForm').addEventListener('submit',async ev=>{ev.preventDefault();const bak=JSON.stringify(P.roles);
+    for(const r of P.roles){const v=V('rl_'+r.id);if(v)r.name=r.actor?v.replace(/\s*역$/,'')+' 역':v}
+    const nn=V('rlNew');if(nn){const act=V('rlKind')==='1';P.roles.push({id:'r'+Date.now().toString(36),name:act?nn.replace(/\s*역$/,'')+' 역':nn,who:'',actor:act||undefined,n:act?P.roles.filter(r=>r.actor).length+1:undefined})}
+    if(await save([],true,'저장했어요.'))closeSheet();else P.roles=JSON.parse(bak);});
+}
+async function delRole(id){const bak=JSON.stringify(P.roles);P.roles=P.roles.filter(r=>r.id!==id);if(role===id)role='all';if(await save([],true,'삭제했어요.'))editRoles();else P.roles=JSON.parse(bak)}
+
+/* 화면에 수정 버튼 붙이기 */
+function edDecorate(){
+  let bar=$('ebar');
+  if(!bar){bar=document.createElement('div');bar.id='ebar';bar.className='ebar';bar.innerHTML='<span><b>제작부 모드</b> 고친 내용은 바로 팀 전원에게 보여요</span><button data-e="off">끄기</button>';document.querySelector('main').prepend(bar)}
+  bar.hidden=!editMode;document.body.classList.toggle('editing',editMode);
+  document.querySelectorAll('.edb,.eacts,.eadd,.edp').forEach(x=>x.remove());
+  if(!editMode||!P)return;
+  $('call').insertAdjacentHTML('beforeend',`<button class="btn edb" data-e="day">회차 정보·콜타임 수정</button>`);
+  $('list').querySelectorAll('li.row').forEach((li,i)=>{
+    const brk=li.classList.contains('brk'),more=li.querySelector('.more');
+    const btns=`<div class="eacts"><button class="btn" data-e="row" data-i="${i}">수정</button><button class="btn" data-e="up" data-i="${i}" aria-label="위로"${i===0?' disabled':''}>↑</button><button class="btn" data-e="down" data-i="${i}" aria-label="아래로"${i===SCH().length-1?' disabled':''}>↓</button><button class="btn" data-e="move" data-i="${i}">회차 이동</button></div>`;
+    if(brk)li.insertAdjacentHTML('beforeend',btns);else if(more)more.insertAdjacentHTML('beforeend',btns);
+  });
+  $('list').insertAdjacentHTML('beforeend',`<li class="eadd"><button class="btn" data-e="addrow">+ 씬 추가</button><button class="btn" data-e="addbrk">+ 식사·이동 추가</button></li>`);
+  $('days').insertAdjacentHTML('beforeend',`<li class="eadd"><button class="btn" data-e="addday">+ 회차 추가</button></li>`);
+  $('people').querySelectorAll('li:not(.empty)').forEach((li,i)=>li.insertAdjacentHTML('beforeend',`<button class="btn edp" data-e="crew" data-i="${i}">수정</button>`));
+  $('people').insertAdjacentHTML('beforeend',`<li class="eadd"><button class="btn" data-e="addcrew">+ 연락처 추가</button><button class="btn" data-e="roles">파트·배우 관리</button></li>`);
+  $('locDl').insertAdjacentHTML('afterend',`<button class="btn edb" data-e="day" id="edLoc">장소·현장 정보 수정</button>`);
+}
+// 기존 그리기 함수 뒤에 수정 버튼을 다시 붙임
+{const _all=all,_list=renderList,_days=renderDays,_contact=renderContact,_call=renderCall;
+ all=function(){_all();edDecorate()};
+ renderList=function(){_list();if(editMode)edDecorate()};
+ renderDays=function(){_days();if(editMode)edDecorate()};
+ renderCall=function(){_call();if(editMode)edDecorate()};
+ renderContact=function(){_contact();if(editMode)edDecorate()};}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-e]');if(!b||b.disabled)return;const i=+b.dataset.i,a=b.dataset.e;
+  if(a==='toggle')toggleEdit();else if(a==='off')toggleEdit();
+  else if(a==='day')editDay(day);else if(a==='row')editRow(i);else if(a==='addrow')addRow(false);else if(a==='addbrk')addRow(true);
+  else if(a==='up')moveRow(i,-1);else if(a==='down')moveRow(i,1);else if(a==='move')askMove(i);else if(a==='moveto')moveTo(i,+b.dataset.to);
+  else if(a==='del')delRow(i);else if(a==='delok')delOk(i);else if(a==='addday')addDay();
+  else if(a==='crew')editCrew(i);else if(a==='addcrew')editCrew(-1);else if(a==='crewdel')delCrew(i);
+  else if(a==='roles')editRoles();else if(a==='roledel')delRole(b.dataset.id);
+});
 
 /* 설치형 웹앱 */
 const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
