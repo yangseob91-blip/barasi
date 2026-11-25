@@ -2,6 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<!-- 바라시 (ㅂㄹㅅ) © 2026 양섭. All rights reserved. made by 양섭 -->
+<meta name="author" content="양섭">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f2f4f6">
 <meta name="description" content="촬영 현장 콜시트, 회차별 스케줄, 대본, 자료를 한 곳에서">
@@ -225,6 +227,8 @@ dt{color:var(--sub);font-size:14px}dd{margin:0}
 .page .d.mine b{color:var(--blue)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:30;background:var(--ink);color:var(--card);padding:12px 18px;border-radius:14px;font-size:14px;max-width:calc(100% - 32px);text-align:center}
 .gate .go:disabled{opacity:.6}
+.by{display:block;margin:14px 0 0;text-align:center;color:var(--sub);font-size:12px;letter-spacing:.2px}
+.splash .by{margin-top:28px}
 .sample{color:var(--sub);font-size:12px;text-align:center;margin:18px 0 0}
 @media(prefers-reduced-motion:reduce){.splash .mark *,.splash .hero{animation:none;opacity:1;transform:none}.sh{animation:none}.splash,.bar i{transition:none}}
 </style>
@@ -252,7 +256,7 @@ dt{color:var(--sub);font-size:14px}dd{margin:0}
       <polygon points="95,0 165,0 165,24 137,46 165,46 165,70 95,70 95,46 123,24 95,24" fill="currentColor"/>
       <polygon points="225,0 260,70 190,70" fill="#2b59ff"/>
     </svg>
-    <b>바라시</b><span>촬영 현장 콜시트</span>
+    <b>바라시</b><span>촬영 현장 콜시트</span><small class="by">made by 양섭</small>
   </div>
 </div>
 
@@ -268,6 +272,7 @@ dt{color:var(--sub);font-size:14px}dd{margin:0}
     <div class="err" id="gErr" role="alert"></div>
     <div class="demo">시연용 프로젝트: 번호 <b>BRS128</b>, 비밀번호 <b>123456</b></div>
     <button class="btn pri go" type="submit">들어가기</button>
+    <p class="by">made by 양섭</p>
   </form>
 </div>
 
@@ -340,7 +345,7 @@ dt{color:var(--sub);font-size:14px}dd{margin:0}
       <ul class="people" id="people"></ul>
     </div>
   </section>
-  <p class="sample">made by 양섭</p>
+  <p class="sample">made by 양섭<br>© 2026 양섭. All rights reserved.</p>
 </main>
 
 <nav class="tabs" aria-label="메뉴"><div role="tablist" id="tabs">
@@ -483,7 +488,7 @@ let lastFocus=null;
 function openSheet(t,html){lastFocus=document.activeElement;$('shT').textContent=t;$('shB').innerHTML=html;$('sheet').hidden=false;$('shB').scrollTop=0;$('shX').focus()}
 function closeSheet(){if($('sheet').hidden)return;$('sheet').hidden=true;if(lastFocus&&lastFocus.isConnected)lastFocus.focus()}
 function pickRole(){openSheet('누구 기준으로 볼까요',`<ul class="pick">${P.roles.map(r=>`<li><button data-pick="${esc(r.id)}" aria-current="${r.id===role}"><span>${esc(r.name)}</span><small>콜 ${esc(callOf(r.id))}</small></button></li>`).join('')}</ul>
-  <div class="proj"><span><small>프로젝트 번호</small><b>${esc(code)}</b></span><button data-logout>나가기</button></div>${standalone?'':'<button class="btn pri go" style="width:100%;margin-top:12px" data-install>홈 화면에 앱으로 설치하기</button>'}`)}
+  <div class="proj"><span><small>프로젝트 번호</small><b>${esc(code)}</b></span><button data-logout>나가기</button></div><p class="by">made by 양섭</p>${standalone?'':'<button class="btn pri go" style="width:100%;margin-top:12px" data-install>홈 화면에 앱으로 설치하기</button>'}`)}
 function showScript(sc){
   const p=SCRIPT[sc];if(!p)return;const me=R().actor?R().name.replace(' 역',''):'';
   openSheet(sc+' 대본',`<div class="page"><p class="h">${esc(p.h)}</p>${p.l.map(x=>x.k==='a'?`<p class="a">${esc(x.t)}</p>`:`<div class="d ${me&&x.c===me?'mine':''}"><b>${esc(x.c)}</b><span>${x.p?`<i>(${esc(x.p)})</i>`:''}${esc(x.t)}</span></div>`).join('')}</div>`);
