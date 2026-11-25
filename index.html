@@ -204,6 +204,99 @@ li.eadd .btn{flex:1;background:var(--bluebg);color:var(--blue)}
 .btn.warn{color:var(--coral);background:var(--coralbg)}.warnbg{background:var(--coral)!important}
 .rrow{display:flex;align-items:center;gap:8px}.rrow input{flex:1}.rrow span{font-size:12px;color:var(--sub);width:30px}
 .rrow .x{width:32px;height:32px;border-radius:50%;background:var(--coralbg);color:var(--coral);font-size:18px;flex:none}
+.cof{flex:none;width:40px;height:40px;border-radius:20px;background:var(--card);font-size:19px;display:grid;place-items:center}
+body.gm-on{overflow:hidden}
+.gm{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column}
+.gm-h{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 14px 8px}
+.gm-h h2{flex:1;margin:0;font-size:18px;font-weight:800}
+.gm-h button{width:44px;height:44px;border-radius:22px;background:var(--card);font-size:18px}
+.gm-b{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 18px calc(24px + env(safe-area-inset-bottom));max-width:560px;width:100%;margin:0 auto;box-sizing:border-box}
+.gface{display:block}
+.g-hero{display:flex;align-items:center;justify-content:center;gap:14px;margin:6px 0 16px}
+.g-hero .gface{width:110px}
+.bubble{position:relative;background:var(--card);border-radius:18px;padding:14px 16px;font-weight:800;font-size:18px;line-height:1.35}
+.bubble:before{content:"";position:absolute;left:-8px;top:50%;margin-top:-8px;border:8px solid transparent;border-right-color:var(--card);border-left:0}
+.bob{animation:bob 2.4s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px) rotate(-3deg)}}
+.g-card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px}
+.g-card h3{margin:0 0 10px;font-size:15px}.g-card h3 span{color:var(--blue);margin-left:4px}
+.g-ppl{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.g-ppl:empty{display:none}
+.g-ppl li{display:flex;align-items:center;gap:2px;background:var(--bluebg);color:var(--blue);border-radius:999px;padding:4px 4px 4px 12px;font-weight:700;font-size:14px}
+.g-ppl button{width:28px;height:28px;border-radius:14px;color:inherit;font-size:16px}
+.g-add{display:flex;gap:8px}.g-add input{flex:1;min-width:0;font:inherit;font-size:16px;border:0;background:var(--soft);border-radius:12px;padding:0 12px;min-height:46px;color:inherit}
+.g-add .btn{flex:none;min-width:72px}
+.g-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.g-sug button{background:var(--soft);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500}
+.g-clear{margin-top:10px;color:var(--sub);font-size:13px;text-decoration:underline}
+.g-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.g-list button{width:100%;display:flex;align-items:center;gap:14px;background:var(--card);border-radius:18px;padding:14px 16px;text-align:left}
+.g-list button:disabled{opacity:.45}
+.g-list .gi{width:46px;height:46px;border-radius:14px;background:var(--bluebg);display:grid;place-items:center;font-size:24px;flex:none}
+.g-list b{display:block;font-size:16px}.g-list small{display:block;color:var(--sub);font-size:13px}
+.g-list span:last-child{margin-left:auto;color:var(--sub);font-size:22px}
+.g-tip{color:var(--sub);font-size:14px;text-align:center;margin:4px 0 12px}
+.g-btns{display:flex;gap:8px;margin-top:16px}.g-btns .btn{flex:1;min-height:52px}.g-btns .btn:not(.pri){background:var(--card)}.btn.big{font-size:18px;min-height:58px}
+.g-turn{text-align:center;font-size:17px;margin:6px 0 14px}.g-turn b{color:var(--blue)}
+/* 결과 */
+.g-res{position:relative;text-align:center;padding:10px 0 6px;overflow:hidden}
+.g-res .gface{width:170px;margin:0 auto}
+.shake{animation:shk .5s ease-in-out 3,bob 2.4s ease-in-out 1.5s infinite}@keyframes shk{25%{transform:rotate(-9deg) scale(1.05)}75%{transform:rotate(9deg) scale(1.05)}}
+.g-loser{font-size:26px;font-weight:800;line-height:1.3;margin:12px 0 4px}.g-loser b{color:var(--coral)}
+.confetti{position:absolute;inset:0;pointer-events:none}
+.confetti i{position:absolute;top:-10px;left:calc(var(--x)*1%);width:8px;height:14px;background:var(--c);border-radius:2px;animation:fall 1.8s var(--d) ease-in forwards;opacity:0}
+@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(320px) rotate(540deg)}}
+.g-rank{list-style:none;counter-reset:r;margin:14px 0 0;padding:0;background:var(--card);border-radius:18px;overflow:hidden}
+.g-rank li{counter-increment:r;display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.g-rank li:before{content:counter(r);color:var(--sub);width:18px}.g-rank li span{flex:1;font-weight:700}
+.g-rank li.lose{background:var(--coralbg);color:var(--coral)}
+/* 사다리 */
+.lad-names{display:grid;margin:0 auto}.lad-names button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;padding:4px 0;border-radius:10px}
+.lad-names .mini{width:34px}.lad-names button.used{opacity:.4}
+.lad-names span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lad-wrap{overflow-x:auto}.lad{display:block;width:100%;margin:0 auto}
+.lad line{stroke:var(--line);stroke-width:4;stroke-linecap:round}
+.lad polyline{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.lad .slot rect{fill:var(--card)}.lad .slot text{text-anchor:middle;font-size:14px;font-weight:800;fill:var(--sub)}
+.lad .slot.open rect{fill:var(--soft)}.lad .slot.open.hit rect{fill:var(--coral)}.lad .slot.open.hit text{fill:#fff;font-size:18px}
+/* 룰렛 */
+.rou{position:relative;max-width:330px;margin:20px auto 0}
+.rou-w{display:block;width:100%;filter:drop-shadow(0 6px 18px rgba(0,0,0,.12))}
+.rou-w text{fill:#fff;font-size:15px;font-weight:800;text-anchor:middle;dominant-baseline:middle}.rou-w text.c{font-size:26px}
+.rou-pin{position:absolute;left:50%;top:-30px;transform:translateX(-50%);z-index:1;display:flex;flex-direction:column;align-items:center}
+.rou-pin .mini{width:52px}.rou-pin i{width:0;height:0;border:11px solid transparent;border-top:16px solid var(--coral);margin-top:-4px}
+/* 슬레이트 */
+.slt{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;min-height:52vh;border-radius:24px;background:var(--card);padding:22px;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:background .1s}
+.slt .mid{width:130px}.slt b{font-size:30px;font-weight:800}.slt small{color:var(--sub);font-size:14px}
+.slt.wait{background:var(--ink);color:var(--card)}.slt.wait small{color:inherit;opacity:.7}
+.slt.go{background:var(--coral);color:#fff}.slt.go small{color:#fff}
+.slt.ng{background:var(--soft)}.slt.ng b{color:var(--coral)}
+.slt.cut b{color:var(--blue)}
+.clap{position:relative;width:120px;height:62px;background:var(--ink);border-radius:6px}
+.slt.wait .clap{background:var(--card)}
+.clap i{position:absolute;left:0;right:0;top:-20px;height:18px;border-radius:4px;background:repeating-linear-gradient(-45deg,#fff 0 10px,#191f28 10px 20px);transform-origin:6px 100%;transform:rotate(-24deg);transition:transform .08s}
+.slt.go .clap i,.slt.cut .clap i{transform:rotate(0)}
+/* 5초 */
+.fv{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);border-radius:24px;padding:22px}
+.fv .mid{width:120px}
+.fv-clock{font-size:64px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.fv-clock.hid{color:var(--sub)}.fv-clock.good{color:#00a86b}.fv-clock.ok{color:var(--blue)}.fv-clock.bad{color:var(--coral)}
+.fv .btn{width:100%}
+/* 폭탄 */
+.bmb{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;min-height:58vh;border-radius:24px;background:var(--card);padding:22px;touch-action:manipulation;user-select:none;-webkit-user-select:none;--sp:.9s}
+.holder{font-size:32px;font-weight:800;color:var(--blue)}
+.bm-art{position:relative;display:block;width:190px;height:190px}
+.bm-art .mid{width:150px;position:absolute;left:0;top:20px}
+.bm{position:absolute;right:0;bottom:4px;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#555,#111 70%)}
+.bm:before{content:"";position:absolute;top:-14px;left:46px;width:6px;height:20px;background:#a67c52;border-radius:3px;transform:rotate(25deg)}
+.spark{position:absolute;top:-22px;left:52px;width:12px;height:12px;border-radius:50%;background:#ffd23f;box-shadow:0 0 10px #ff9f1c;opacity:0}
+.bmb.lit .spark{opacity:1;animation:spk var(--sp) infinite}
+.bmb.lit .bm-art{animation:tick var(--sp) infinite}
+@keyframes spk{50%{transform:scale(1.6)}}@keyframes tick{50%{transform:scale(1.04) rotate(-2deg)}}
+.bmb.pass .holder{animation:pop .25s}@keyframes pop{0%{transform:scale(.6);opacity:.3}}
+.bmb b{font-size:18px}
+.bmb.boom{background:var(--coral);color:#fff;animation:shk .15s 6}.bmb.boom .holder{color:#fff}
+.bmb.boom .bm{animation:none;transform:scale(2.4);opacity:0;transition:.3s}
+@media (prefers-reduced-motion:reduce){.bob,.shake,.bmb.lit .bm-art,.confetti i{animation:none}}
+
 .ttv{list-style:none;margin:6px 0 0;padding:0;max-height:42vh;overflow-y:auto}
 .ttv li{display:grid;grid-template-columns:86px 1fr;gap:2px 10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
 .ttv li span{color:var(--sub);font-variant-numeric:tabular-nums;font-size:13px}.ttv li small{grid-column:2;color:var(--sub);font-size:12px}
@@ -336,6 +429,7 @@ dt{color:var(--sub);font-size:14px}dd{margin:0}
 <header class="top">
   <svg class="mark" viewBox="0 0 260 70" role="img" aria-label="바라시"><use href="#mk"/></svg>
   <div class="ttl"><h1 id="pTitle"></h1><p id="pSub"></p></div>
+  <button class="cof" id="cofBtn" aria-label="커피내기 게임" aria-haspopup="dialog">☕</button>
   <button class="who" id="whoBtn" aria-haspopup="dialog"></button>
 </header>
 
@@ -426,6 +520,7 @@ dt{color:var(--sub);font-size:14px}dd{margin:0}
 
 <div class="toast" id="toast" role="status" hidden></div>
 
+<div class="gm" id="gm" hidden role="dialog" aria-modal="true" aria-labelledby="gmT"><div class="gm-h"><button id="gmBack" aria-label="게임 목록으로">←</button><h2 id="gmT">커피내기</h2><button id="gmX" aria-label="닫기">×</button></div><div class="gm-b" id="gmB"></div></div>
 <div class="sheet" id="sheet" hidden>
   <div class="sh" role="dialog" aria-modal="true" aria-labelledby="shT">
     <div class="sh-h"><h3 id="shT"></h3><button id="shX" aria-label="닫기">×</button></div>
@@ -1425,6 +1520,148 @@ document.body.insertAdjacentHTML('beforeend','<input type="file" id="ttIn" hidde
 $('ttIn').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f)importTT(f)});
 $('contiIn').addEventListener('change',e=>{const l=[...e.target.files];e.target.value='';if(l.length)uploadConti(l)});
 $('conti').addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){e.stopPropagation();delFile(+d.dataset.del,false)}});
+/* ☕ 커피내기: 사다리·룰렛·슬레이트·5초·폭탄 (캐릭터 출연) */
+const FACE=(c='',st='')=>`<svg class="gface ${c}" viewBox="0 0 300 290" aria-hidden="true"${st?` style="${st}"`:''}><use href="#face" width="300" height="290"/></svg>`;
+const rnd=n=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n};
+const rndf=(a,b)=>a+(rnd(1e6)/1e6)*(b-a);
+const buzz=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(_){}};
+let GP=[];try{GP=JSON.parse(store.get('barasi_players')||'[]')}catch(_){GP=[]}
+const saveGP=()=>store.set('barasi_players',JSON.stringify(GP));
+let gmTimer=[];const gmClear=()=>{gmTimer.forEach(t=>{clearTimeout(t);clearInterval(t);cancelAnimationFrame(t)});gmTimer=[]};
+const GAMES=[
+ {id:'ladder',name:'사다리타기',desc:'국룰. 한 칸에 커피가 숨어 있어요',ic:'🪜'},
+ {id:'roulette',name:'룰렛',desc:'한 번 돌려서 바로 결정',ic:'🎯'},
+ {id:'slate',name:'슬레이트 타이밍',desc:'“액션!” 뜨면 제일 늦게 누른 사람',ic:'🎬'},
+ {id:'five',name:'정확히 5초',desc:'감으로 5.00초. 제일 많이 벗어나면 당첨',ic:'⏱️'},
+ {id:'bomb',name:'폭탄 돌리기',desc:'폰을 넘기다 터질 때 든 사람',ic:'💣'},
+];
+function gmOpen(){gmHome();$('gm').hidden=false;document.body.classList.add('gm-on');setTimeout(()=>$('gmX').focus(),30)}
+function gmClose(){gmClear();$('gm').hidden=true;document.body.classList.remove('gm-on');$('cofBtn').focus()}
+function gmSet(t,html,back){gmClear();$('gmT').textContent=t;$('gmBack').hidden=!back;$('gmB').innerHTML=html;$('gmB').scrollTop=0}
+function gmHome(){
+  const sug=[...new Set([...(P&&P.crew||[]).map(c=>c.n),...(P&&P.roles||[]).filter(r=>r.actor).map(r=>r.name.replace(/ 역$/,''))])].filter(n=>n&&n.length<=8&&!GP.includes(n)).slice(0,8);
+  gmSet('커피내기',`<div class="g-hero">${FACE('bob')}<div class="bubble">오늘 커피는<br>누가 쏠까요? ☕</div></div>
+  <section class="g-card"><h3>참가자 <span id="gpN">${GP.length}명</span></h3>
+   <ul class="g-ppl" id="gpL">${GP.map((n,i)=>`<li><span>${esc(n)}</span><button data-gdel="${i}" aria-label="${esc(n)} 빼기">×</button></li>`).join('')}</ul>
+   <form id="gpF" class="g-add"><input id="gpI" maxlength="8" placeholder="이름 넣고 추가" autocomplete="off" aria-label="참가자 이름"><button class="btn pri" type="submit">추가</button></form>
+   ${sug.length?`<div class="g-sug">${sug.map(n=>`<button data-gadd="${esc(n)}">+ ${esc(n)}</button>`).join('')}</div>`:''}
+   ${GP.length?`<button class="g-clear" data-gclear>모두 지우기</button>`:''}
+  </section>
+  <ul class="g-list">${GAMES.map(g=>`<li><button data-game="${g.id}"${GP.length<2?' disabled':''}><span class="gi" aria-hidden="true">${g.ic}</span><span><b>${g.name}</b><small>${g.desc}</small></span><span aria-hidden="true">›</span></button></li>`).join('')}</ul>
+  ${GP.length<2?'<p class="hint" style="text-align:center">참가자를 2명 이상 넣으면 시작할 수 있어요</p>':''}
+  <p class="by" style="text-align:center">made by 양섭</p>`,false);
+  $('gpF').addEventListener('submit',e=>{e.preventDefault();const v=TT.norm($('gpI').value).slice(0,8);if(!v)return;if(GP.includes(v)){toast('이미 있는 이름이에요.');return}if(GP.length>=12){toast('12명까지 할 수 있어요.');return}GP.push(v);saveGP();gmHome();$('gpI').focus()});
+}
+function gmResult(loser,sub,rows){
+  buzz([80,60,200]);
+  gmSet('결과',`<div class="g-res">${FACE('shake')}<div class="confetti" aria-hidden="true">${Array.from({length:18},(_,i)=>`<i style="--x:${rnd(100)};--d:${rnd(600)}ms;--c:${['#2b59ff','#ff5b3a','#ffd23f'][i%3]}"></i>`).join('')}</div>
+   <p class="g-loser"><b>${esc(loser)}</b>님이<br>커피 쏩니다 ☕</p>${sub?`<p class="hint">${esc(sub)}</p>`:''}</div>
+   ${rows?`<ol class="g-rank">${rows.map(r=>`<li class="${r.lose?'lose':''}"><span>${esc(r.n)}</span><b>${esc(r.v)}</b></li>`).join('')}</ol>`:''}
+   <div class="g-btns"><button class="btn pri" data-again>한 판 더</button><button class="btn" data-ghome>다른 게임</button></div>`,true);
+}
+let gmLast=null;
+function gmStart(id){gmLast=id;({ladder,roulette,slate,five,bomb})[id]()}
+
+/* 1. 사다리 */
+function ladder(){
+  const N=GP.length,L=10,cw=Math.max(56,Math.min(80,320/N)),W=cw*N,H=360,top=58,bot=H-58,lv=(bot-top)/(L+1);
+  const rungs=[];for(let l=1;l<=L;l++){let used=new Set();for(let c=0;c<N-1;c++){if(used.has(c))continue;if(rnd(100)<45){rungs.push({l,c});used.add(c);used.add(c+1)}}}
+  for(let c=0;c<N-1;c++)if(!rungs.some(r=>r.c===c)){let l=1+rnd(L);while(rungs.some(r=>r.l===l&&(r.c===c-1||r.c===c+1)))l=1+rnd(L);rungs.push({l,c})}
+  const hit=rnd(N);
+  const path=s=>{let c=s;const pts=[[c*cw+cw/2,top]];for(let l=1;l<=L;l++){const y=top+l*lv;const r=rungs.find(r=>r.l===l&&(r.c===c||r.c===c-1));if(r){pts.push([c*cw+cw/2,y]);c=r.c===c?c+1:c-1;pts.push([c*cw+cw/2,y])}}pts.push([c*cw+cw/2,bot]);return{pts,end:c}};
+  const svg=`<svg class="lad" viewBox="0 0 ${W} ${H}" style="max-width:${W}px">${Array.from({length:N},(_,c)=>`<line x1="${c*cw+cw/2}" y1="${top}" x2="${c*cw+cw/2}" y2="${bot}"/>`).join('')}
+    ${rungs.map(r=>`<line x1="${r.c*cw+cw/2}" y1="${top+r.l*lv}" x2="${(r.c+1)*cw+cw/2}" y2="${top+r.l*lv}"/>`).join('')}
+    <g id="ladP"></g>
+    ${Array.from({length:N},(_,c)=>`<g class="slot${c===hit?' hit':''}" id="slot${c}"><rect x="${c*cw+6}" y="${bot+10}" width="${cw-12}" height="34" rx="10"/><text x="${c*cw+cw/2}" y="${bot+32}">?</text></g>`).join('')}
+    <g id="ladF" style="display:none"><use href="#face" x="-17" y="-17" width="34" height="33"/></g></svg>`;
+  gmSet('사다리타기',`<p class="g-tip">이름을 누르면 한 명씩 내려가요. 커피 칸은 하나예요.</p>
+  <div class="lad-names" style="max-width:${W}px;grid-template-columns:repeat(${N},1fr)">${GP.map((n,i)=>`<button data-lad="${i}">${FACE('mini')}<span>${esc(n)}</span></button>`).join('')}</div>
+  <div class="lad-wrap">${svg}</div>
+  <div class="g-btns"><button class="btn" data-ladall>한 번에 다 보기</button></div>`,true);
+  const done=new Set();let busy=false;
+  const run=(i,fast)=>new Promise(res=>{const {pts,end}=path(i);const g=$('ladP');const col=['#2b59ff','#ff5b3a','#00a86b','#9b5cff','#ff9f1c','#00a3c4'][i%6];
+    const pl=document.createElementNS('http://www.w3.org/2000/svg','polyline');pl.setAttribute('points',pts.map(p=>p.join(',')).join(' '));pl.setAttribute('stroke',col);g.appendChild(pl);
+    const len=pts.reduce((a,p,k)=>k?a+Math.hypot(p[0]-pts[k-1][0],p[1]-pts[k-1][1]):0,0);pl.style.strokeDasharray=len;pl.style.strokeDashoffset=len;
+    const f=$('ladF');f.style.display='';const dur=fast?500:1700;const t0=performance.now();
+    const step=now=>{const k=Math.min(1,(now-t0)/dur);let d=k*len,x=pts[0][0],y=pts[0][1];for(let j=1;j<pts.length;j++){const s=Math.hypot(pts[j][0]-pts[j-1][0],pts[j][1]-pts[j-1][1]);if(d<=s){x=pts[j-1][0]+(pts[j][0]-pts[j-1][0])*(d/s);y=pts[j-1][1]+(pts[j][1]-pts[j-1][1])*(d/s);break}d-=s;x=pts[j][0];y=pts[j][1]}
+      f.setAttribute('transform',`translate(${x},${y})`);pl.style.strokeDashoffset=len*(1-k);
+      if(k<1)gmTimer.push(requestAnimationFrame(step));else{f.style.display='none';const sl=$('slot'+end);sl.classList.add('open');sl.querySelector('text').textContent=end===hit?'☕':'통과';buzz(end===hit?[60,40,60]:15);res(end===hit)}};
+    gmTimer.push(requestAnimationFrame(step))});
+  $('gmB').querySelectorAll('[data-lad]').forEach(b=>b.addEventListener('click',async()=>{const i=+b.dataset.lad;if(busy||done.has(i))return;busy=true;done.add(i);b.classList.add('used');const lose=await run(i);busy=false;if(lose)gmTimer.push(setTimeout(()=>gmResult(GP[i],'사다리를 타고 커피 칸에 도착했어요'),900))}));
+  $('gmB').querySelector('[data-ladall]').addEventListener('click',async()=>{if(busy)return;busy=true;for(let i=0;i<N;i++){if(done.has(i))continue;done.add(i);$('gmB').querySelector(`[data-lad="${i}"]`).classList.add('used');if(await run(i,true)){gmTimer.push(setTimeout(()=>gmResult(GP[i],'사다리를 타고 커피 칸에 도착했어요'),900));return}}busy=false});
+}
+
+/* 2. 룰렛 */
+function roulette(){
+  const N=GP.length,a=360/N,R=140,C=150;const cols=['#2b59ff','#4f78ff','#1a3fd1','#7d9bff'];
+  const seg=(i)=>{const s=(i*a-90)*Math.PI/180,e=((i+1)*a-90)*Math.PI/180;return `M${C},${C} L${C+R*Math.cos(s)},${C+R*Math.sin(s)} A${R},${R} 0 ${a>180?1:0} 1 ${C+R*Math.cos(e)},${C+R*Math.sin(e)} Z`};
+  const lab=i=>{const m=((i+.5)*a-90)*Math.PI/180;return [C+R*.64*Math.cos(m),C+R*.64*Math.sin(m),(i+.5)*a]};
+  gmSet('룰렛',`<div class="rou"><div class="rou-pin" aria-hidden="true">${FACE('mini')}<i></i></div>
+   <svg viewBox="0 0 300 300" class="rou-w" id="rouW"><circle cx="150" cy="150" r="146" fill="var(--card)"/>${GP.map((n,i)=>{const [x,y,r]=lab(i);return `<path d="${seg(i)}" fill="${N===1?cols[0]:cols[i%(N%4===1&&i===N-1?3:4)]}" stroke="#fff" stroke-width="2"/><text x="${x}" y="${y}" transform="rotate(${r>180?r+90:r-90} ${x} ${y})">${esc(n)}</text>`}).join('')}<circle cx="150" cy="150" r="30" fill="#fff"/><text x="150" y="157" class="c">☕</text></svg></div>
+   <div class="g-btns"><button class="btn pri big" id="rouGo">돌리기</button></div>`,true);
+  let rot=0;$('rouGo').addEventListener('click',()=>{const b=$('rouGo');b.disabled=true;b.textContent='두구두구…';buzz(20);
+    const pick=rnd(N);const target=360*(6+rnd(3))+(360-((pick+.2+rndf(0,.6))*a));rot+=target-rot%360;const w=$('rouW');w.style.transition='transform 4.8s cubic-bezier(.12,.75,.12,1)';w.style.transform=`rotate(${rot}deg)`;
+    gmTimer.push(setTimeout(()=>gmResult(GP[pick],'룰렛이 멈춘 자리'),5200))});
+}
+
+/* 3. 슬레이트 타이밍 */
+function slate(){
+  const recs=[];let i=0;
+  const turn=()=>{if(i>=GP.length)return finish();const n=GP[i];
+    gmSet('슬레이트 타이밍',`<p class="g-turn"><b>${esc(n)}</b>님 차례 (${i+1}/${GP.length})</p>
+    <button class="slt" id="slt" aria-live="assertive"><span class="clap" aria-hidden="true"><i></i></span>${FACE('mid')}<b id="sltT">준비되면 누르세요</b><small id="sltS">“액션!” 뜨기 전에 누르면 NG</small></button>`,true);
+    let state='idle',t0=0;const el=$('slt');
+    const go=()=>{if(state==='idle'){state='wait';el.classList.add('wait');$('sltT').textContent='조용히…';$('sltS').textContent='곧 “액션!”이 떠요';
+        gmTimer.push(setTimeout(()=>{state='go';t0=performance.now();el.classList.remove('wait');el.classList.add('go');$('sltT').textContent='액션!';$('sltS').textContent='지금 누르세요!';buzz(30)},rndf(1500,4800)))}
+      else if(state==='wait'){gmClear();state='done';el.classList.remove('wait');el.classList.add('ng');buzz([100,50,100]);$('sltT').textContent='NG!';$('sltS').textContent='너무 빨랐어요';recs.push({n,ms:null});i++;gmTimer.push(setTimeout(turn,1500))}
+      else if(state==='go'){state='done';const ms=Math.round(performance.now()-t0);el.classList.remove('go');el.classList.add('cut');$('sltT').textContent=`${ms}ms`;$('sltS').textContent=ms<250?'번개 같은 컷!':ms<400?'좋은 컷':'살짝 늦었어요';recs.push({n,ms});i++;gmTimer.push(setTimeout(turn,1500))}};
+    el.addEventListener('pointerdown',e=>{e.preventDefault();go()});el.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();go()}});el.focus();};
+  const finish=()=>{const ng=recs.filter(r=>r.ms==null);let loser;
+    if(ng.length)loser=ng[rnd(ng.length)];else loser=recs.reduce((a,b)=>b.ms>a.ms?b:a);
+    const rows=[...recs].sort((a,b)=>(a.ms??1e9)-(b.ms??1e9)).map(r=>({n:r.n,v:r.ms==null?'NG':r.ms+'ms',lose:r===loser}));
+    gmResult(loser.n,ng.length>1?`NG ${ng.length}명 중 추첨`:ng.length?'NG를 냈어요':'제일 늦게 눌렀어요',rows)};
+  turn();
+}
+
+/* 4. 정확히 5초 */
+function five(){
+  const recs=[];let i=0;
+  const turn=()=>{if(i>=GP.length)return finish();const n=GP[i];
+    gmSet('정확히 5초',`<p class="g-turn"><b>${esc(n)}</b>님 차례 (${i+1}/${GP.length})</p>
+    <div class="fv">${FACE('mid',)}<div class="fv-clock" id="fvC">0.00</div><p class="hint" id="fvH">시작하고 1초 뒤엔 숫자를 가려요. 마음속으로 5초!</p>
+    <button class="btn pri big" id="fvB">시작</button></div>`,true);
+    let st=0,raf=0;const b=$('fvB'),c=$('fvC');
+    const tick=()=>{const s=(performance.now()-st)/1000;c.textContent=s<1?s.toFixed(2):'?.??';if(s>=1)c.classList.add('hid');raf=requestAnimationFrame(tick);gmTimer.push(raf)};
+    b.addEventListener('click',()=>{if(!st){st=performance.now();b.textContent='멈춰!';buzz(15);tick()}else{cancelAnimationFrame(raf);const s=(performance.now()-st)/1000,d=Math.abs(s-5);c.classList.remove('hid');c.textContent=s.toFixed(2);c.classList.add(d<.1?'good':d<.5?'ok':'bad');
+      $('fvH').textContent=d<.05?'신의 감각!':d<.3?`${d.toFixed(2)}초 차이`:`${d.toFixed(2)}초나 차이 나요`;b.disabled=true;recs.push({n,s,d});i++;buzz(15);gmTimer.push(setTimeout(turn,1700))}});
+  };
+  const finish=()=>{const loser=recs.reduce((a,b)=>b.d>a.d?b:a);gmResult(loser.n,`5초에서 ${loser.d.toFixed(2)}초 벗어났어요`,[...recs].sort((a,b)=>a.d-b.d).map(r=>({n:r.n,v:`${r.s.toFixed(2)}초`,lose:r===loser})))};
+  turn();
+}
+
+/* 5. 폭탄 돌리기 */
+function bomb(){
+  let cur=rnd(GP.length),passes=0;const fuse=rndf(9000,24000);let t0=0;
+  gmSet('폭탄 돌리기',`<p class="g-tip">폰을 들고 있는 사람이 화면을 누르면 다음 사람에게 넘어가요. 표시된 사람에게 폰을 건네주세요!</p>
+  <button class="bmb" id="bmb"><span class="holder" id="bmH">${esc(GP[cur])}</span><span class="bm-art" aria-hidden="true">${FACE('mid')}<span class="bm"><i class="spark"></i></span></span><b id="bmT">누르면 시작</b></button>`,true);
+  const el=$('bmb');let on=false;
+  const pulse=()=>{if(!on)return;const left=fuse-(performance.now()-t0);if(left<=0)return boom();const sp=Math.max(.12,Math.min(.9,left/fuse));el.style.setProperty('--sp',sp+'s');gmTimer.push(setTimeout(pulse,200))};
+  const boom=()=>{on=false;el.classList.add('boom');buzz([300,80,300]);$('bmT').textContent='펑!';gmTimer.push(setTimeout(()=>gmResult(GP[cur],`${passes}번 넘긴 끝에 폭탄이 터졌어요`),1300))};
+  el.addEventListener('click',()=>{if(el.classList.contains('boom'))return;if(!on){on=true;t0=performance.now();el.classList.add('lit');$('bmT').textContent='누르면 넘기기 →';pulse();return}
+    cur=(cur+1)%GP.length;passes++;$('bmH').textContent=GP[cur];el.classList.remove('pass');void el.offsetWidth;el.classList.add('pass');buzz(10)});
+}
+
+/* 이벤트 */
+$('cofBtn').addEventListener('click',gmOpen);$('gmX').addEventListener('click',gmClose);$('gmBack').addEventListener('click',gmHome);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('gm').hidden&&$('sheet').hidden)gmClose()});
+$('gmB').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.gdel!=null){GP.splice(+t.dataset.gdel,1);saveGP();gmHome()}
+  else if(t.dataset.gadd){if(GP.length<12&&!GP.includes(t.dataset.gadd)){GP.push(t.dataset.gadd);saveGP()}gmHome()}
+  else if(t.hasAttribute('data-gclear')){GP=[];saveGP();gmHome()}
+  else if(t.dataset.game&&!t.disabled)gmStart(t.dataset.game);
+  else if(t.hasAttribute('data-again'))gmStart(gmLast);
+  else if(t.hasAttribute('data-ghome'))gmHome()});
+
 /* 설치형 웹앱 */
 const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 let deferred=null;
