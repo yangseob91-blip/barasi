@@ -380,7 +380,7 @@ const store={get(k){try{return localStorage.getItem(k)}catch(_){return null}},se
 
 /* 서버 */
 async function rpc(fn,args){
-  const r=await fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});
+  let r;try{r=await fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify(args)})}catch(_){const e=new Error('net');e.net=true;throw e}
   const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(_){}
   if(!r.ok){const e=new Error((j&&j.message)||'server');e.server=true;throw e}
   return j;
@@ -608,7 +608,7 @@ $('gateForm').addEventListener('submit',async e=>{
     role='all';apply(await rpc('barasi_load',{p_token:token}));
     $('gate').hidden=true;loadFiles(true);
   }catch(err){
-    $('gErr').textContent=!err.server?'인터넷 연결을 확인해 주세요.':/too_many/.test(err.message)?'여러 번 틀려서 잠겼어요. 10분 뒤에 다시 시도해 주세요.':'번호나 비밀번호가 맞지 않아요. 제작부에 다시 확인해 주세요.';
+    $('gErr').textContent=err.net?'인터넷 연결을 확인해 주세요.':!err.server?'화면을 여는 중 오류가 났어요: '+(err&&err.message||err)+' (이 문구를 캡처해서 보내주세요)':/too_many/.test(err.message)?'여러 번 틀려서 잠겼어요. 10분 뒤에 다시 시도해 주세요.':'번호나 비밀번호가 맞지 않아요. 제작부에 다시 확인해 주세요.';
     $('gPw').value='';$('gPw').focus();
   }finally{btn.disabled=false;btn.textContent='들어가기'}
 });
