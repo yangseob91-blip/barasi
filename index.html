@@ -167,6 +167,16 @@ main{max-width:560px;margin:0 auto;padding:4px 16px calc(110px + env(safe-area-i
 .up input:focus-visible+label{outline:3px solid var(--blue);outline-offset:2px}
 .up label.btn{cursor:pointer;width:100%}
 .hint{color:var(--sub);font-size:13px;margin:8px 0 0}
+.pinf label{display:block;font-size:13px;color:var(--sub);margin:4px 0 6px}
+.pinf input{width:100%;font-size:22px;font-weight:700;letter-spacing:4px;border:0;border-bottom:2px solid var(--line);background:transparent;padding:8px 2px 10px;border-radius:0}
+.pinf input:focus{outline:none;border-bottom-color:var(--blue)}
+.pinf .err{color:var(--coral);font-size:14px;min-height:22px;margin:8px 0 6px}
+.upv{list-style:none;margin:10px 0 14px;padding:0;max-height:38vh;overflow-y:auto;border-top:1px solid var(--line)}
+.upv li{padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.upv b{margin-right:6px}
+.upw{color:var(--coral);font-size:13px;margin:0 0 10px}
+.upo{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:0 0 14px}
+.upo input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--blue)}
 
 /* 자료 */
 .field{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;font-size:14px;color:var(--sub)}
@@ -315,9 +325,11 @@ dt{color:var(--sub);font-size:14px}dd{margin:0}
       <ul class="slist" id="slist"></ul>
     </div>
     <div class="card up">
-      <input type="file" id="scriptIn" accept=".txt,text/plain">
-      <label class="btn ghost" for="scriptIn" style="background:var(--soft)">대본 파일 불러오기</label>
-      <p class="hint">텍스트(.txt) 파일에서 S#번호로 씬을 나눠 자동으로 연결해요</p>
+      <h2>대본 올리기</h2>
+      <p class="cap">제작부만 할 수 있어요. 대본 PDF를 올리면 씬별로 나눠서 팀 전원에게 바로 보여줘요. 수정고가 나오면 새 파일을 다시 올리면 돼요.</p>
+      <input type="file" id="scriptIn" accept="application/pdf,.pdf,.txt,text/plain">
+      <label class="btn pri" for="scriptIn">대본 PDF 올리기</label>
+      <p class="hint">Final Draft에서 PDF로 내보낸 대본에 맞춰져 있어요. 텍스트(.txt)도 돼요.</p>
     </div>
   </section>
 
@@ -589,7 +601,7 @@ async function delFile(i,inSheet){
 
 /* 입장 */
 function showGate(){$('gate').hidden=false;$('gCode').value='';$('gPw').value='';$('gErr').textContent='';setTimeout(()=>$('gCode').focus(),50)}
-function logout(silent){
+function logout(silent){isAdmin=false;
   if(token&&!silent)rpc('barasi_logout',{p_token:token}).catch(()=>{});
   token='';store.del('barasi_token');store.del('barasi_cache');FILES=[];filesLoaded=false;P=null;
   closeSheet();showGate();
@@ -628,15 +640,138 @@ $('seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
 $('dP').onclick=()=>{delayBy[day]=Math.min(delay()+10,180);renderList();queueSave()};
 $('dM').onclick=()=>{delayBy[day]=Math.max(delay()-10,0);renderList();queueSave()};
 $('fileIn').addEventListener('change',e=>{const l=[...e.target.files];e.target.value='';if(l.length)uploadFiles(l)});
+/* 대본 올리기 (제작부) */
+// 바라시 대본 파서: pdf.js 텍스트 조각 → {S#n:{h,l:[{k:'a',t}|{k:'d',c,t,p?}]}}
+async function barasiParseScript(pdf,onProg){
+  const L=[];// {pg,y,x,items}
+  for(let pn=1;pn<=pdf.numPages;pn++){
+    const pg=await pdf.getPage(pn);const tc=await pg.getTextContent({disableNormalization:true});
+    const rows=new Map();
+    for(const it of tc.items){if(!it.str)continue;const y=Math.round(it.transform[5]);let k=[...rows.keys()].find(v=>Math.abs(v-y)<=2);if(k===undefined){k=y;rows.set(k,[])}rows.get(k).push({x:it.transform[4],w:it.width,s:it.str})}
+    // 줄 끝 띄어쓰기는 pdf.js 텍스트에서 빠지므로 원본 글자 명령에서 직접 확인
+    const ends=new Map();
+    try{const ol=await pg.getOperatorList();const OPS=(globalThis.pdfjsLib||globalThis.__pdfjs).OPS;const segs=new Map();let ty=0,tx=0;
+      for(let i=0;i<ol.fnArray.length;i++){const f=ol.fnArray[i],a=ol.argsArray[i];
+        if(f===OPS.setTextMatrix){tx=a[4];ty=Math.round(a[5])}
+        else if(f===OPS.showText||f===OPS.showSpacedText){const t=(a[0]||[]).map(g=>g&&typeof g==='object'?(g.unicode||''):'').join('');let k=[...segs.keys()].find(v=>Math.abs(v-ty)<=3);if(k===undefined){k=ty;segs.set(k,[])}segs.get(k).push([tx,t])}}
+      for(const v of segs.values()){v.sort((a,b)=>a[0]-b[0]);const t=v.map(x=>x[1]).join('');ends.set(t.replace(/\s/g,''),/\s$/.test(t))}
+    }catch(_){}
+    for(const [y,its] of rows){its.sort((a,b)=>a.x-b.x);const key=its.map(i=>i.s).join('').replace(/\s/g,'');L.push({pg:pn,y,its,end:ends.has(key)?ends.get(key):null})}
+    if(onProg)onProg(pn,pdf.numPages);
+  }
+  L.sort((a,b)=>a.pg-b.pg||b.y-a.y);
+  // 줄마다 텍스트, 시작 x, 단어 사이 큰 틈(이름|대사)
+  for(const l of L){
+    const w=l.its.filter(i=>i.s.trim());l.x=w.length?w[0].x:0;
+    l.text=l.its.map(i=>i.s).join('').replace(/\s+/g,' ').trim();
+    const lw=w[w.length-1];l.re=lw?lw.x+lw.w:0;
+    l.split=null;
+    for(let j=0;j<w.length-1&&j<4;j++){const a=w[j],b=w[j+1];const gap=b.x-(a.x+Math.min(a.w,a.s.length*12));
+      if(gap>30){l.split={c:l.its.filter(i=>i.x<b.x-0.5).map(i=>i.s).join('').replace(/\s+/g,' ').trim(),x:b.x,t:l.its.filter(i=>i.x>=b.x-0.5).map(i=>i.s).join('')};break}}
+  }
+  // 머리말·꼬리말(여러 페이지 같은 자리 반복)과 쪽번호 제거
+  const pages=pdf.numPages,cnt=new Map();
+  for(const l of L){const k=l.y+'|'+l.text.replace(/\d+/g,'#');cnt.set(k,(cnt.get(k)||0)+1)}
+  const body=L.filter(l=>l.text&&!/^-?\s*\d+\s*-?\.?$/.test(l.text)&&!(pages>4&&cnt.get(l.y+'|'+l.text.replace(/\d+/g,'#'))>pages*0.4));
+  // 왼쪽 여백(가장 흔한 시작 x)
+  const xs=new Map();for(const l of body){const k=Math.round(l.x);xs.set(k,(xs.get(k)||0)+1)}
+  const xL=[...xs.entries()].sort((a,b)=>b[1]-a[1])[0][0];
+  const HEAD=/^(?:(?:S\s*#|#|씬\s*)\s*(\d{1,4})\.?|(\d{1,4})\.)\s+(\S.*)$/;const isHead=l=>Math.abs(l.x-xL)<6&&HEAD.test(l.text);
+  // 대사 칸 x(이름 뒤 대사 시작 위치 중 가장 흔한 값)
+  const dx=new Map();for(const l of body)if(l.split&&!isHead(l)&&l.split.c.length<=12){const k=Math.round(l.split.x);dx.set(k,(dx.get(k)||0)+1)}
+  const xD=dx.size?[...dx.entries()].sort((a,b)=>b[1]-a[1])[0][0]:null;
+  // 이름 뒤 틈이 좁아도 대사 칸(xD)에서 시작하는 줄은 이름|대사로 나눔
+  if(xD)for(const l of body){if(isHead(l)||l.x>=xD-20||l.x<xL+15)continue;const w=l.its.filter(i=>i.s.trim());const j=w.findIndex((i,n)=>n>0&&Math.abs(i.x-xD)<4);
+    if(j>0){const c=l.its.filter(i=>i.x<w[j].x-0.5).map(i=>i.s).join('').replace(/\s+/g,' ').trim();if(c.length<=16)l.split={c,x:w[j].x,t:l.its.filter(i=>i.x>=w[j].x-0.5).map(i=>i.s).join('')}}}
+  // 줄 끝 띄어쓰기: Final Draft는 한글을 글자 단위로 줄바꿈해서, 오른쪽 여백이 한 글자 이상 남으면 원래 띄어쓰기였던 자리
+  const pct=a=>{a=a.filter(Boolean).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length*0.97)]:0};
+  const xRa=pct(body.filter(l=>Math.abs(l.x-xL)<6).map(l=>l.re));
+  const xRd=xD?pct(body.filter(l=>Math.abs(l.x-xD)<6||(l.split&&Math.abs(l.split.x-xD)<6)).map(l=>l.re)):xRa;
+  for(const l of body){if(l.end!==null){l.sp=l.end;continue}const dcol=xD&&(Math.abs(l.x-xD)<6||(l.split&&Math.abs(l.split.x-xD)<6));l.sp=((dcol?xRd:xRa)-l.re)>7}
+  // 줄 간격
+  const gaps=[];for(let i=1;i<body.length;i++)if(body[i].pg===body[i-1].pg)gaps.push(body[i-1].y-body[i].y);
+  gaps.sort((a,b)=>a-b);const lh=gaps.length?gaps[Math.floor(gaps.length*0.3)]:14;
+  const S={};let cur=null,para=null,dlg=null,prev=null;
+  const join=(acc,l,t)=>acc+(acc&&prev.sp?' ':'')+t.trim();
+  const fp=()=>{if(cur&&para&&para.trim())S[cur].l.push({k:'a',t:para.trim()});para=null};
+  const fd=()=>{if(cur&&dlg){let t=dlg.t.trim(),p=null;const m=t.match(/^\(([^)]{1,40})\)\s*(.*)$/);if(m&&m[2]){p=m[1];t=m[2]}const it={k:'d',c:dlg.c,t};if(p)it.p=p;S[cur].l.push(it)}dlg=null};
+  for(const l of body){
+    const brk=prev&&(prev.pg!==l.pg?false:(prev.y-l.y)>lh*1.45);
+    if(isHead(l)){fp();fd();const m=l.text.match(HEAD);const n=+(m[1]||m[2]);cur='S#'+n;S[cur]={h:'S#'+n+'. '+m[3].trim(),l:[]};prev=l;continue}
+    if(!cur){prev=l;continue}
+    if(xD&&l.split&&Math.abs(l.split.x-xD)<6&&l.split.c.length<=16&&l.x<xD-20){fp();fd();dlg={c:l.split.c,t:l.split.t.trim()};prev=l;continue}
+    if(dlg&&xD&&Math.abs(l.x-xD)<6&&!brk){dlg.t=join(dlg.t,l,l.text);prev=l;continue}
+    if(dlg)fd();
+    if(cur&&S[cur].l.length===0&&para===null&&!brk&&prev&&isHead(prev)&&Math.abs(l.x-xL)>=6){S[cur].h+=' '+l.text;prev=l;continue}
+    if(brk)fp();
+    para=para===null?l.text:join(para,l,l.text);prev=l;
+  }
+  fp();fd();
+  return S;
+}
+
+var isAdmin=false,upPending=null;
+const PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/';
+async function loadPdfjs(){
+  if(globalThis.pdfjsLib)return globalThis.pdfjsLib;
+  const m=await import(PDFJS+'legacy/build/pdf.min.mjs');
+  m.GlobalWorkerOptions.workerSrc=PDFJS+'legacy/build/pdf.worker.min.mjs';
+  globalThis.pdfjsLib=m;return m;
+}
+function askAdmin(){
+  return new Promise(res=>{
+    openSheet('제작부 확인',`<form class="pinf" id="pinForm" novalidate><p>대본은 팀 전원이 보는 자료라 제작부 비밀번호를 한 번 확인할게요.</p><label for="pinIn">제작부 비밀번호</label><input id="pinIn" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="••••••"><div class="err" id="pinErr" role="alert"></div><button class="btn pri go" style="width:100%" type="submit">확인</button></form>`);
+    const f=$('pinForm'),inp=$('pinIn');inp.focus();
+    inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'').slice(0,6);$('pinErr').textContent=''});
+    f.addEventListener('submit',async ev=>{ev.preventDefault();
+      if(inp.value.length!==6){$('pinErr').textContent='숫자 6자리를 입력하세요.';return}
+      const btn=f.querySelector('button');btn.disabled=true;btn.textContent='확인하는 중…';
+      try{await rpc('barasi_admin',{p_token:token,p_pw:inp.value});isAdmin=true;res(true)}
+      catch(err){$('pinErr').textContent=err.net?'인터넷 연결을 확인해 주세요.':/too_many/.test(err.message)?'여러 번 틀려서 잠겼어요. 10분 뒤에 다시 시도해 주세요.':'제작부 비밀번호가 맞지 않아요.';inp.value='';inp.focus();btn.disabled=false;btn.textContent='확인'}
+    });
+    const obs=setInterval(()=>{if($('sheet').hidden){clearInterval(obs);res(false)}},400);
+  });
+}
+function showUpPreview(p,name){
+  const k=Object.keys(p).sort((a,b)=>+a.slice(2)-+b.slice(2));const nums=k.map(x=>+x.slice(2));
+  const miss=[];for(let n=nums[0];n<nums[nums.length-1];n++)if(!nums.includes(n))miss.push(n);
+  const empty=k.filter(x=>!p[x].l.length);
+  const had=Object.keys(SCRIPT).length;
+  upPending=p;
+  openSheet('대본 확인',`<p><b>${esc(name)}</b>에서 씬 ${k.length}개를 찾았어요 (S#${nums[0]}~S#${nums[nums.length-1]}).</p>
+  ${miss.length?`<p class="upw">빠진 번호가 있어요: S#${miss.slice(0,12).join(', S#')}${miss.length>12?' 외 '+(miss.length-12)+'개':''}. 대본에 원래 없는 씬이면 괜찮아요.</p>`:''}
+  ${empty.length?`<p class="upw">내용이 비어 있는 씬: ${esc(empty.slice(0,8).join(', '))}</p>`:''}
+  <ul class="upv">${k.map(x=>`<li><b>${esc(x)}</b>${esc(p[x].h.replace(/^S#\d+\.\s*/,''))}</li>`).join('')}</ul>
+  ${had?`<label class="upo"><input type="checkbox" id="upRep" checked><span>지금 올라가 있는 대본(씬 ${had}개)을 지우고 이걸로 바꾸기<br><small style="color:var(--sub)">끄면 같은 번호의 씬만 새로 바뀌어요</small></span></label>`:''}
+  <button class="btn pri go" style="width:100%" id="upSave">이 대본으로 저장하기</button>`);
+  $('upSave').addEventListener('click',saveUp);
+}
+async function saveUp(){
+  const p=upPending;if(!p)return;const rep=$('upRep')?$('upRep').checked:true;const btn=$('upSave');btn.disabled=true;btn.textContent='저장하는 중…';
+  try{
+    const n=await rpc('barasi_upload_scripts',{p_token:token,p_scripts:p,p_replace:rep});
+    SCRIPT=rep?Object.assign({},p):Object.assign({},SCRIPT,p);upPending=null;renderList();renderScenes();
+    openSheet('대본 올리기',`<p>씬 ${n}개를 저장했어요. 팀 전원에게 바로 보여요.</p>`);
+  }catch(err){
+    if(err.server&&/not_admin/.test(err.message)){isAdmin=false;btn.disabled=false;btn.textContent='이 대본으로 저장하기';if(await askAdmin())showUpPreview(p,'대본');return}
+    btn.disabled=false;btn.textContent='이 대본으로 저장하기';toast(err.net?'인터넷 연결을 확인해 주세요.':'저장하지 못했어요. 다시 시도해 주세요.');
+  }
+}
 $('scriptIn').addEventListener('change',async e=>{
   const f=e.target.files[0];e.target.value='';if(!f)return;
+  if(!isAdmin&&!(await askAdmin()))return;
+  const pdf=/\.pdf$/i.test(f.name)||f.type==='application/pdf';
+  openSheet('대본 읽는 중',`<p id="upProg">${pdf?'PDF를 여는 중이에요…':'파일을 읽는 중이에요…'}</p>`);
   try{
-    const p=parseScript(await f.text());const k=Object.keys(p);
-    if(!k.length){openSheet('대본 불러오기','<p>씬 번호를 찾지 못했어요. 씬 제목 줄이 S#12처럼 시작하는지 확인해 주세요.</p>');return}
-    await rpc('barasi_save_scripts',{p_token:token,p_scripts:p});
-    SCRIPT=Object.assign({},SCRIPT,p);renderList();renderScenes();
-    openSheet('대본 불러오기',`<p>${k.length}개 씬을 찾아 저장했어요. 팀 전원에게 바로 보여요.<br>${esc(k.join(', '))}</p>`);
-  }catch(err){openSheet('대본 불러오기',`<p>${err.server?'서버에 저장하지 못했어요. 다시 시도해 주세요.':'파일을 읽지 못했어요. 텍스트(.txt) 파일인지 확인해 주세요.'}</p>`)}
+    let p;
+    if(pdf){
+      const lib=await loadPdfjs();
+      const doc=await lib.getDocument({data:new Uint8Array(await f.arrayBuffer()),cMapUrl:PDFJS+'cmaps/',cMapPacked:true,standardFontDataUrl:PDFJS+'standard_fonts/'}).promise;
+      p=await barasiParseScript(doc,(a,b)=>{const el=$('upProg');if(el)el.textContent=`${b}쪽 중 ${a}쪽 읽는 중…`});
+    }else p=parseScript(await f.text());
+    if(!Object.keys(p).length){openSheet('대본 올리기','<p>씬 번호를 찾지 못했어요. 씬 제목 줄이 "12." 또는 "S#12"처럼 시작하는지 확인해 주세요.</p>');return}
+    showUpPreview(p,f.name);
+  }catch(err){openSheet('대본 올리기',`<p>${err.net?'인터넷 연결을 확인해 주세요.':'파일을 읽지 못했어요. 대본 PDF나 텍스트 파일이 맞는지 확인해 주세요.'}</p><p class="hint">${esc(String(err&&err.message||err))}</p>`)}
 });
 $('files').addEventListener('click',e=>{
   const d=e.target.closest('[data-del]');if(d){delFile(+d.dataset.del,false);return}
