@@ -267,16 +267,12 @@ body.gm-on{overflow:hidden}
 .rou-pin{position:absolute;left:50%;top:-30px;transform:translateX(-50%);z-index:1;display:flex;flex-direction:column;align-items:center}
 .rou-pin .mini{width:52px}.rou-pin i{width:0;height:0;border:11px solid transparent;border-top:16px solid var(--coral);margin-top:-4px}
 /* 슬레이트 */
-.slt{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;min-height:52vh;border-radius:24px;background:var(--card);padding:22px;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:background .1s}
-.slt .mid{width:130px}.slt b{font-size:30px;font-weight:800}.slt small{color:var(--sub);font-size:14px}
+.slt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;border-radius:24px;background:var(--card);padding:30px 22px 28px;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:background .1s}
+.slt .mid{width:150px;margin-bottom:4px}.slt b{font-size:30px;font-weight:800}.slt small{color:var(--sub);font-size:14px}
 .slt.wait{background:#0b0d10;color:#fff}.slt.wait small{color:inherit;opacity:.7}
 .slt.go{background:var(--coral);color:#fff}.slt.go small{color:#fff}
 .slt.ng{background:var(--soft)}.slt.ng b{color:var(--coral)}
 .slt.cut b{color:var(--blue)}
-.clap{position:relative;width:120px;height:62px;margin-top:46px;background:#191f28;border-radius:6px;box-shadow:0 0 0 2px rgba(255,255,255,.14)}
-.slt.wait .clap{background:#2b3139}
-.clap i{position:absolute;left:0;right:0;top:-20px;height:18px;border-radius:4px;background:repeating-linear-gradient(-45deg,#fff 0 10px,#191f28 10px 20px);transform-origin:6px 100%;transform:rotate(-20deg);transition:transform .08s}
-.slt.go .clap i,.slt.cut .clap i{transform:rotate(0)}
 /* 5초 */
 .fv{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);border-radius:24px;padding:22px}
 .fv .mid{width:120px}
@@ -1637,7 +1633,7 @@ function slate(){
   const recs=[];let i=0;
   const turn=()=>{if(i>=GP.length)return finish();const n=GP[i];
     gmSet('슬레이트 타이밍',`<p class="g-turn"><b>${esc(n)}</b>님 차례 (${i+1}/${GP.length})</p>
-    <button class="slt" id="slt" aria-live="assertive"><span class="clap" aria-hidden="true"><i></i></span>${FACE('mid')}<b id="sltT">준비되면 누르세요</b><small id="sltS">“액션!” 뜨기 전에 누르면 NG</small></button>`,true);
+    <button class="slt" id="slt" aria-live="assertive">${FACE('mid')}<b id="sltT">준비되면 누르세요</b><small id="sltS">“액션!” 뜨기 전에 누르면 NG</small></button>`,true);
     let state='idle',t0=0;const el=$('slt');
     const go=()=>{if(state==='idle'){state='wait';el.classList.add('wait');$('sltT').textContent='조용히…';$('sltS').textContent='곧 “액션!”이 떠요';
         gmTimer.push(setTimeout(()=>{state='go';t0=performance.now();el.classList.remove('wait');el.classList.add('go');$('sltT').textContent='액션!';$('sltS').textContent='지금 누르세요!';buzz(30)},rndf(1500,4800)))}
@@ -1702,7 +1698,7 @@ function install(){
     :'<p>크롬 오른쪽 위 <b>메뉴(점 세 개)</b>를 누르고 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 고르면 설치돼요.</p>');
 }
 // 새 버전이 올라오면 앱을 열 때 알아서 새로고침 (홈 화면 앱이 옛 화면에 멈춰 있지 않게)
-const APP_VER='barasi-v15';
+const APP_VER='barasi-v16';
 async function checkVer(){
   try{const t=await fetch('sw.js?t='+Date.now(),{cache:'no-store'}).then(r=>r.text());const v=(t.match(/VERSION\s*=\s*'([^']+)'/)||[])[1];
     if(!v||v===APP_VER||sessionStorage.getItem('barasi_reload')===v)return;
