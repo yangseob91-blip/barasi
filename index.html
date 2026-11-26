@@ -238,6 +238,9 @@ body.gm-on{overflow:hidden}
 .g-list span:last-child{margin-left:auto;color:var(--sub);font-size:22px}
 .g-tip{color:var(--sub);font-size:14px;text-align:center;margin:4px 0 12px}
 .g-btns{display:flex;gap:8px;margin-top:16px}.g-btns .btn{flex:1;min-height:52px}.g-btns .btn:not(.pri){background:var(--card)}.btn.big{font-size:18px;min-height:58px}
+.gm-b.play{display:flex;flex-direction:column;overflow:hidden}.gm-b.play>*{flex:none}
+.gm-b.play>.slt,.gm-b.play>.fv,.gm-b.play>.bmb,.gm-b.play>.lad-box,.gm-b.play>.rou-box{flex:1 1 auto;min-height:0}
+.gm-b.play .g-btns{margin-top:12px}.gm-b.play .bm-art{zoom:1.3}
 .g-turn{text-align:center;font-size:17px;margin:6px 0 14px}.g-turn b{color:var(--blue)}
 /* 결과 */
 .g-res{position:relative;text-align:center;padding:10px 0 6px;overflow:hidden}
@@ -255,32 +258,32 @@ body.gm-on{overflow:hidden}
 .lad-names{display:grid;margin:0 auto}.lad-names button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;padding:4px 0;border-radius:10px}
 .lad-names .mini{width:34px}.lad-names button.used{opacity:.4}
 .lad-names span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lad-wrap{overflow-x:auto}.lad{display:block;width:100%;margin:0 auto}
+.lad-box{overflow-x:auto;overflow-y:hidden;display:flex;flex-direction:column}.lad-in{margin:0 auto}.lad{display:block;margin:0 auto}
 .lad line{stroke:var(--line);stroke-width:4;stroke-linecap:round}
 .lad polyline{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
 .lad .slot rect{fill:var(--card)}.lad .slot text{text-anchor:middle;font-size:14px;font-weight:800;fill:var(--sub)}
 .lad .slot.open rect{fill:var(--soft)}.lad .slot.open.hit rect{fill:var(--coral)}.lad .slot.open.hit text{fill:#fff;font-size:18px}
 /* 룰렛 */
-.rou{position:relative;max-width:330px;margin:20px auto 0}
+.rou-box{container-type:size;display:flex;align-items:center;justify-content:center}.rou{position:relative;width:min(100%,100cqh - 44px,460px);margin-top:34px}
 .rou-w{display:block;width:100%;filter:drop-shadow(0 6px 18px rgba(0,0,0,.12))}
 .rou-w text{fill:#fff;font-size:15px;font-weight:800;text-anchor:middle;dominant-baseline:middle}.rou-w text.c{font-size:26px}
 .rou-pin{position:absolute;left:50%;top:-30px;transform:translateX(-50%);z-index:1;display:flex;flex-direction:column;align-items:center}
 .rou-pin .mini{width:52px}.rou-pin i{width:0;height:0;border:11px solid transparent;border-top:16px solid var(--coral);margin-top:-4px}
 /* 슬레이트 */
 .slt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;border-radius:24px;background:var(--card);padding:30px 22px 28px;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:background .1s}
-.slt .mid{width:150px;margin-bottom:4px}.slt b{font-size:30px;font-weight:800}.slt small{color:var(--sub);font-size:14px}
+.slt .mid{width:min(190px,48vw);margin-bottom:8px}.slt b{font-size:30px;font-weight:800}.slt small{color:var(--sub);font-size:14px}
 .slt.wait{background:#0b0d10;color:#fff}.slt.wait small{color:inherit;opacity:.7}
 .slt.go{background:var(--coral);color:#fff}.slt.go small{color:#fff}
 .slt.ng{background:var(--soft)}.slt.ng b{color:var(--coral)}
 .slt.cut b{color:var(--blue)}
 /* 5초 */
-.fv{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);border-radius:24px;padding:22px}
-.fv .mid{width:120px}
-.fv-clock{font-size:64px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.fv{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--card);border-radius:24px;padding:22px}
+.fv .mid{width:min(160px,42vw)}.fv .mid{margin-top:auto}.fv .btn{margin-top:auto}
+.fv-clock{font-size:76px;font-weight:800;letter-spacing:-1px;line-height:1.1}
 .fv-clock.hid{color:var(--sub)}.fv-clock.good{color:#00a86b}.fv-clock.ok{color:var(--blue)}.fv-clock.bad{color:var(--coral)}
 .fv .btn{width:100%}
 /* 폭탄 */
-.bmb{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;min-height:58vh;border-radius:24px;background:var(--card);padding:22px;touch-action:manipulation;user-select:none;-webkit-user-select:none;--sp:.9s}
+.bmb{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;justify-content:center;border-radius:24px;background:var(--card);padding:22px;touch-action:manipulation;user-select:none;-webkit-user-select:none;--sp:.9s}
 .holder{font-size:32px;font-weight:800;color:var(--blue)}
 .bm-art{position:relative;display:block;width:190px;height:190px}
 .bm-art .mid{width:150px;position:absolute;left:0;top:20px}
@@ -1561,7 +1564,7 @@ const GAMES=[
 ];
 function gmOpen(){gmHome();$('gm').hidden=false;document.body.classList.add('gm-on');setTimeout(()=>$('gmX').focus(),30)}
 function gmClose(){gmClear();$('gm').hidden=true;document.body.classList.remove('gm-on');$('cofBtn').focus()}
-function gmSet(t,html,back){gmClear();$('gmT').textContent=t;$('gmBack').hidden=!back;$('gmB').innerHTML=html;$('gmB').scrollTop=0}
+function gmSet(t,html,back,play){gmClear();$('gmT').textContent=t;$('gmBack').hidden=!back;$('gmB').classList.toggle('play',!!play);$('gmB').innerHTML=html;$('gmB').scrollTop=0}
 function gmHome(){
   const sug=[...new Set([...(P&&P.crew||[]).map(c=>c.n),...(P&&P.roles||[]).filter(r=>r.actor).map(r=>r.name.replace(/ 역$/,''))])].filter(n=>n&&n.length<=8&&!GP.includes(n)).slice(0,8);
   gmSet('커피내기',`<div class="g-hero">${FACE('bob')}<div class="bubble">오늘 커피는<br>누가 쏠까요? ☕</div></div>
@@ -1588,20 +1591,21 @@ function gmStart(id){gmLast=id;({ladder,roulette,slate,five,bomb})[id]()}
 
 /* 1. 사다리 */
 function ladder(){
-  const N=GP.length,L=10,cw=Math.max(56,Math.min(80,320/N)),W=cw*N,H=360,top=58,bot=H-58,lv=(bot-top)/(L+1);
+  const N=GP.length,L=10;let cw=60,W=cw*N,H=360,top=22,bot=H-58,lv=(bot-top)/(L+1);
   const rungs=[];for(let l=1;l<=L;l++){let used=new Set();for(let c=0;c<N-1;c++){if(used.has(c))continue;if(rnd(100)<45){rungs.push({l,c});used.add(c);used.add(c+1)}}}
   for(let c=0;c<N-1;c++)if(!rungs.some(r=>r.c===c)){let l=1+rnd(L);while(rungs.some(r=>r.l===l&&(r.c===c-1||r.c===c+1)))l=1+rnd(L);rungs.push({l,c})}
   const hit=rnd(N);
   const path=s=>{let c=s;const pts=[[c*cw+cw/2,top]];for(let l=1;l<=L;l++){const y=top+l*lv;const r=rungs.find(r=>r.l===l&&(r.c===c||r.c===c-1));if(r){pts.push([c*cw+cw/2,y]);c=r.c===c?c+1:c-1;pts.push([c*cw+cw/2,y])}}pts.push([c*cw+cw/2,bot]);return{pts,end:c}};
-  const svg=`<svg class="lad" viewBox="0 0 ${W} ${H}" style="max-width:${W}px">${Array.from({length:N},(_,c)=>`<line x1="${c*cw+cw/2}" y1="${top}" x2="${c*cw+cw/2}" y2="${bot}"/>`).join('')}
+  const svg=()=>`<svg class="lad" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${Array.from({length:N},(_,c)=>`<line x1="${c*cw+cw/2}" y1="${top}" x2="${c*cw+cw/2}" y2="${bot}"/>`).join('')}
     ${rungs.map(r=>`<line x1="${r.c*cw+cw/2}" y1="${top+r.l*lv}" x2="${(r.c+1)*cw+cw/2}" y2="${top+r.l*lv}"/>`).join('')}
     <g id="ladP"></g>
     ${Array.from({length:N},(_,c)=>`<g class="slot${c===hit?' hit':''}" id="slot${c}"><rect x="${c*cw+6}" y="${bot+10}" width="${cw-12}" height="34" rx="10"/><text x="${c*cw+cw/2}" y="${bot+32}">?</text></g>`).join('')}
     <g id="ladF" style="display:none"><use href="#face" x="-17" y="-17" width="34" height="33"/></g></svg>`;
   gmSet('사다리타기',`<p class="g-tip">이름을 누르면 한 명씩 내려가요. 커피 칸은 하나예요.</p>
-  <div class="lad-names" style="max-width:${W}px;grid-template-columns:repeat(${N},1fr)">${GP.map((n,i)=>`<button data-lad="${i}">${FACE('mini')}<span>${esc(n)}</span></button>`).join('')}</div>
-  <div class="lad-wrap">${svg}</div>
-  <div class="g-btns"><button class="btn" data-ladall>한 번에 다 보기</button></div>`,true);
+  <div class="lad-box" id="ladBox"><div class="lad-in" id="ladIn"><div class="lad-names" id="ladN" style="grid-template-columns:repeat(${N},1fr)">${GP.map((n,i)=>`<button data-lad="${i}">${FACE('mini')}<span>${esc(n)}</span></button>`).join('')}</div><div id="ladS"></div></div></div>
+  <div class="g-btns"><button class="btn" data-ladall>한 번에 다 보기</button></div>`,true,true);
+  {const bx=$('ladBox'),nh=$('ladN').offsetHeight;cw=Math.max(48,Math.floor(bx.clientWidth/N));W=cw*N;H=Math.max(300,bx.clientHeight-nh-4);bot=H-52;lv=(bot-top)/(L+1);
+   $('ladIn').style.width=W+'px';$('ladS').innerHTML=svg()}
   const done=new Set();let busy=false;
   const run=(i,fast)=>new Promise(res=>{const {pts,end}=path(i);const g=$('ladP');const col=['#2b59ff','#ff5b3a','#00a86b','#9b5cff','#ff9f1c','#00a3c4'][i%6];
     const pl=document.createElementNS('http://www.w3.org/2000/svg','polyline');pl.setAttribute('points',pts.map(p=>p.join(',')).join(' '));pl.setAttribute('stroke',col);g.appendChild(pl);
@@ -1620,9 +1624,9 @@ function roulette(){
   const N=GP.length,a=360/N,R=140,C=150;const cols=['#2b59ff','#4f78ff','#1a3fd1','#7d9bff'];
   const seg=(i)=>{const s=(i*a-90)*Math.PI/180,e=((i+1)*a-90)*Math.PI/180;return `M${C},${C} L${C+R*Math.cos(s)},${C+R*Math.sin(s)} A${R},${R} 0 ${a>180?1:0} 1 ${C+R*Math.cos(e)},${C+R*Math.sin(e)} Z`};
   const lab=i=>{const m=((i+.5)*a-90)*Math.PI/180;return [C+R*.64*Math.cos(m),C+R*.64*Math.sin(m),(i+.5)*a]};
-  gmSet('룰렛',`<div class="rou"><div class="rou-pin" aria-hidden="true">${FACE('mini')}<i></i></div>
-   <svg viewBox="0 0 300 300" class="rou-w" id="rouW"><circle cx="150" cy="150" r="146" fill="var(--card)"/>${GP.map((n,i)=>{const [x,y,r]=lab(i);return `<path d="${seg(i)}" fill="${N===1?cols[0]:cols[i%(N%4===1&&i===N-1?3:4)]}" stroke="#fff" stroke-width="2"/><text x="${x}" y="${y}" transform="rotate(${r>180?r+90:r-90} ${x} ${y})">${esc(n)}</text>`}).join('')}<circle cx="150" cy="150" r="30" fill="#fff"/><text x="150" y="157" class="c">☕</text></svg></div>
-   <div class="g-btns"><button class="btn pri big" id="rouGo">돌리기</button></div>`,true);
+  gmSet('룰렛',`<div class="rou-box"><div class="rou"><div class="rou-pin" aria-hidden="true">${FACE('mini')}<i></i></div>
+   <svg viewBox="0 0 300 300" class="rou-w" id="rouW"><circle cx="150" cy="150" r="146" fill="var(--card)"/>${GP.map((n,i)=>{const [x,y,r]=lab(i);return `<path d="${seg(i)}" fill="${N===1?cols[0]:cols[i%(N%4===1&&i===N-1?3:4)]}" stroke="#fff" stroke-width="2"/><text x="${x}" y="${y}" transform="rotate(${r>180?r+90:r-90} ${x} ${y})">${esc(n)}</text>`}).join('')}<circle cx="150" cy="150" r="30" fill="#fff"/><text x="150" y="157" class="c">☕</text></svg></div></div>
+   <div class="g-btns"><button class="btn pri big" id="rouGo">돌리기</button></div>`,true,true);
   let rot=0;$('rouGo').addEventListener('click',()=>{const b=$('rouGo');b.disabled=true;b.textContent='두구두구…';buzz(20);
     const pick=rnd(N);const target=360*(6+rnd(3))+(360-((pick+.2+rndf(0,.6))*a));rot+=target-rot%360;const w=$('rouW');w.style.transition='transform 4.8s cubic-bezier(.12,.75,.12,1)';w.style.transform=`rotate(${rot}deg)`;
     gmTimer.push(setTimeout(()=>gmResult(GP[pick],'룰렛이 멈춘 자리'),5200))});
@@ -1633,7 +1637,7 @@ function slate(){
   const recs=[];let i=0;
   const turn=()=>{if(i>=GP.length)return finish();const n=GP[i];
     gmSet('슬레이트 타이밍',`<p class="g-turn"><b>${esc(n)}</b>님 차례 (${i+1}/${GP.length})</p>
-    <button class="slt" id="slt" aria-live="assertive">${FACE('mid')}<b id="sltT">준비되면 누르세요</b><small id="sltS">“액션!” 뜨기 전에 누르면 NG</small></button>`,true);
+    <button class="slt" id="slt" aria-live="assertive">${FACE('mid')}<b id="sltT">준비되면 누르세요</b><small id="sltS">“액션!” 뜨기 전에 누르면 NG</small></button>`,true,true);
     let state='idle',t0=0;const el=$('slt');
     const go=()=>{if(state==='idle'){state='wait';el.classList.add('wait');$('sltT').textContent='조용히…';$('sltS').textContent='곧 “액션!”이 떠요';
         gmTimer.push(setTimeout(()=>{state='go';t0=performance.now();el.classList.remove('wait');el.classList.add('go');$('sltT').textContent='액션!';$('sltS').textContent='지금 누르세요!';buzz(30)},rndf(1500,4800)))}
@@ -1653,7 +1657,7 @@ function five(){
   const turn=()=>{if(i>=GP.length)return finish();const n=GP[i];
     gmSet('정확히 5초',`<p class="g-turn"><b>${esc(n)}</b>님 차례 (${i+1}/${GP.length})</p>
     <div class="fv">${FACE('mid',)}<div class="fv-clock" id="fvC">0.00</div><p class="hint" id="fvH">시작하고 1초 뒤엔 숫자를 가려요. 마음속으로 5초!</p>
-    <button class="btn pri big" id="fvB">시작</button></div>`,true);
+    <button class="btn pri big" id="fvB">시작</button></div>`,true,true);
     let st=0,raf=0;const b=$('fvB'),c=$('fvC');
     const tick=()=>{const s=(performance.now()-st)/1000;c.textContent=s<1?s.toFixed(2):'?.??';if(s>=1)c.classList.add('hid');raf=requestAnimationFrame(tick);gmTimer.push(raf)};
     b.addEventListener('click',()=>{if(!st){st=performance.now();b.textContent='멈춰!';buzz(15);tick()}else{cancelAnimationFrame(raf);const s=(performance.now()-st)/1000,d=Math.abs(s-5);c.classList.remove('hid');c.textContent=s.toFixed(2);c.classList.add(d<.1?'good':d<.5?'ok':'bad');
@@ -1667,7 +1671,7 @@ function five(){
 function bomb(){
   let cur=rnd(GP.length),passes=0;const fuse=rndf(9000,24000);let t0=0;
   gmSet('폭탄 돌리기',`<p class="g-tip">폰을 들고 있는 사람이 화면을 누르면 다음 사람에게 넘어가요. 표시된 사람에게 폰을 건네주세요!</p>
-  <button class="bmb" id="bmb"><span class="holder" id="bmH">${esc(GP[cur])}</span><span class="bm-art" aria-hidden="true">${FACE('mid')}<span class="bm"><i class="spark"></i></span></span><b id="bmT">누르면 시작</b></button>`,true);
+  <button class="bmb" id="bmb"><span class="holder" id="bmH">${esc(GP[cur])}</span><span class="bm-art" aria-hidden="true">${FACE('mid')}<span class="bm"><i class="spark"></i></span></span><b id="bmT">누르면 시작</b></button>`,true,true);
   const el=$('bmb');let on=false;
   const pulse=()=>{if(!on)return;const left=fuse-(performance.now()-t0);if(left<=0)return boom();const sp=Math.max(.12,Math.min(.9,left/fuse));el.style.setProperty('--sp',sp+'s');gmTimer.push(setTimeout(pulse,200))};
   const boom=()=>{on=false;el.classList.add('boom');buzz([300,80,300]);$('bmT').textContent='펑!';gmTimer.push(setTimeout(()=>gmResult(GP[cur],`${passes}번 넘긴 끝에 폭탄이 터졌어요`),1300))};
@@ -1698,7 +1702,7 @@ function install(){
     :'<p>크롬 오른쪽 위 <b>메뉴(점 세 개)</b>를 누르고 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 고르면 설치돼요.</p>');
 }
 // 새 버전이 올라오면 앱을 열 때 알아서 새로고침 (홈 화면 앱이 옛 화면에 멈춰 있지 않게)
-const APP_VER='barasi-v16';
+const APP_VER='barasi-v17';
 async function checkVer(){
   try{const t=await fetch('sw.js?t='+Date.now(),{cache:'no-store'}).then(r=>r.text());const v=(t.match(/VERSION\s*=\s*'([^']+)'/)||[])[1];
     if(!v||v===APP_VER||sessionStorage.getItem('barasi_reload')===v)return;
