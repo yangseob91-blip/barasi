@@ -240,6 +240,9 @@ body.gm-on{overflow:hidden}
 .g-btns{display:flex;gap:8px;margin-top:16px}.g-btns .btn{flex:1;min-height:52px}.g-btns .btn:not(.pri){background:var(--card)}.btn.big{font-size:18px;min-height:58px}
 .gm-b.play{display:flex;flex-direction:column;overflow:hidden}.gm-b.play>*{flex:none}
 .gm-b.play>.slt,.gm-b.play>.fv,.gm-b.play>.bmb,.gm-b.play>.lad-box,.gm-b.play>.rou-box{flex:1 1 auto;min-height:0}
+.calchg{list-style:none;margin:12px 0 4px;padding:0;max-height:42vh;overflow:auto;border-radius:14px;background:var(--soft)}
+.calchg li{padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px;line-height:1.45}.calchg li:last-child{border:0}
+.calchg b{display:inline-block;min-width:44px}.calchg .ca b{color:var(--blue)}.calchg .cd{color:var(--coral)}
 .gm-b.play .g-btns{margin-top:12px}.gm-b.res{display:flex;flex-direction:column}.gm-b.res>*{flex:none}.gm-b.res>.g-res{flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;align-items:center}.gm-b.play .bm-art{zoom:1.3}
 .g-turn{text-align:center;font-size:17px;margin:6px 0 14px}.g-turn b{color:var(--blue)}
 /* 결과 */
@@ -1162,14 +1165,14 @@ function edDecorate(){
   bar.hidden=!editMode;if(document.body.classList.contains('editing')!==editMode){document.body.classList.toggle('editing',editMode);renderFiles()}
   document.querySelectorAll('.edb,.eacts,.eadd,.edp').forEach(x=>x.remove());
   if(!editMode||!P)return;
-  $('call').insertAdjacentHTML('beforeend',`<button class="btn edb" data-e="day">회차 정보·콜타임 수정</button><button class="btn edb" data-e="ttimp">시간표 파일(엑셀·PPT·PDF)로 넣기</button>`);
+  $('call').insertAdjacentHTML('beforeend',`<button class="btn edb" data-e="day">회차 정보·콜타임 수정</button><button class="btn edb" data-e="ttimp">시간표·촬영 캘린더 파일로 넣기</button>`);
   $('list').querySelectorAll('li.row').forEach((li,i)=>{
     const brk=li.classList.contains('brk'),more=li.querySelector('.more');
     const btns=`<div class="eacts"><button class="btn" data-e="row" data-i="${i}">수정</button><button class="btn" data-e="up" data-i="${i}" aria-label="위로"${i===0?' disabled':''}>↑</button><button class="btn" data-e="down" data-i="${i}" aria-label="아래로"${i===SCH().length-1?' disabled':''}>↓</button><button class="btn" data-e="move" data-i="${i}">회차 이동</button></div>`;
     if(brk)li.insertAdjacentHTML('beforeend',btns);else if(more)more.insertAdjacentHTML('beforeend',btns);
   });
   $('list').insertAdjacentHTML('beforeend',`<li class="eadd"><button class="btn" data-e="addrow">+ 씬 추가</button><button class="btn" data-e="addbrk">+ 식사·이동 추가</button></li>`);
-  $('days').insertAdjacentHTML('beforeend',`<li class="eadd"><button class="btn" data-e="addday">+ 회차 추가</button><button class="btn" data-e="ttimp">시간표 파일로 넣기</button></li>`);
+  $('days').insertAdjacentHTML('beforeend',`<li class="eadd"><button class="btn" data-e="addday">+ 회차 추가</button><button class="btn" data-e="ttimp">촬영 캘린더 다시 올리기</button></li>`);
   $('people').querySelectorAll('li:not(.empty)').forEach((li,i)=>li.insertAdjacentHTML('beforeend',`<button class="btn edp" data-e="crew" data-i="${i}">수정</button>`));
   $('people').insertAdjacentHTML('beforeend',`<li class="eadd"><button class="btn" data-e="addcrew">+ 연락처 추가</button><button class="btn" data-e="roles">파트·배우 관리</button></li>`);
   $('locDl').insertAdjacentHTML('afterend',`<button class="btn edb" data-e="day" id="edLoc">장소·현장 정보 수정</button>`);
@@ -1452,6 +1455,157 @@ TT.toDay=(res,roles)=>{
   return {day,roles,crew:res.crew,title:M.title||'',ep:M.ep?+M.ep:null};
 };
 
+/* 바라시 촬영 캘린더(달력형 회차표) 읽기
+   요일 머리줄(일~토)로 칸을 나누고, 칸 오른쪽 위 숫자를 날짜로, 칸 안의 "씬 장소 D/N 제목 출연" 줄을 씬으로 읽는다. */
+const CAL={};
+CAL.DN=/^(D|N|E|M|낮|밤|새벽|아침|저녁|오후|오전|DAY|NIGHT)$/i;
+CAL.SC=/^(?:S#|#)?\d{1,3}(?:-\d{1,2})?[A-Za-z]?$/;
+CAL.WD='일월화수목금토';
+CAL.words=async(pdf,maxPages=8)=>{
+  const pages=[];
+  for(let pn=1;pn<=Math.min(pdf.numPages,maxPages);pn++){
+    const pg=await pdf.getPage(pn);const H=pg.getViewport({scale:1}).height;
+    const tc=await pg.getTextContent({disableNormalization:true});const ws=[];
+    for(const it of tc.items){const s=it.str||'';if(!s.trim())continue;
+      const x=it.transform[4],h=Math.abs(it.transform[3])||8,top=H-it.transform[5]-h,cw=(it.width||s.length*h*.6)/Math.max(1,s.length);
+      let i=0;for(const tok of s.split(/(\s+)/)){if(tok&&!/^\s+$/.test(tok))ws.push({t:tok,x:x+i*cw,top,h});i+=tok.length}}
+    // 붙어 있는 조각 합치기 (pdf가 한 단어를 여러 조각으로 줄 때)
+    ws.sort((a,b)=>a.top-b.top||a.x-b.x);
+    pages.push(ws);
+  }
+  return pages;
+};
+CAL.read=async(pdf,roles)=>{
+  const pages=await CAL.words(pdf);
+  let year=null,month=null,prevDay=0;const days=[];
+  const actorInit={};(roles||[]).filter(r=>r.actor).forEach(r=>{const c=r.name.replace(/ 역$/,'')[0];if(c&&!actorInit[c])actorInit[c]=r.id});
+  for(const ws of pages){
+    // 연도·월
+    for(const w of ws){const m=w.t.match(/^(20\d\d)[.년\/-]/);if(m&&!year)year=+m[1]}
+    // 요일 머리줄
+    const wd=ws.filter(w=>w.t.length===1&&CAL.WD.includes(w.t)||/^(일|월|화|수|목|금|토)요일$/.test(w.t)||/^(SUN|MON|TUE|WED|THU|FRI|SAT)$/i.test(w.t));
+    const byTop={};wd.forEach(w=>{const k=Math.round(w.top/3);(byTop[k]=byTop[k]||[]).push(w)});
+    const head=Object.values(byTop).filter(g=>g.length>=5).sort((a,b)=>b.length-a.length||a[0].top-b[0].top)[0];
+    if(!head)continue;
+    const cen=head.map(w=>w.x+w.h*.5*w.t.length).sort((a,b)=>a-b);const sp=(cen[cen.length-1]-cen[0])/(cen.length-1);
+    const start=cen.map(c=>c-sp/2-8);const col=x=>{let c=-1;start.forEach((s,i)=>{if(x>=s)c=i});return c};
+    const headTop=head[0].top;
+    // 출연 머리글자 (예: 금성태중한윤)
+    const init={...actorInit};
+    ws.filter(w=>w.top>headTop&&w.top<headTop+30&&/^[가-힣]{3,8}$/.test(w.t)&&!/장소|씬|제목|내용|출연|비고/.test(w.t)).forEach(w=>{[...w.t].forEach(ch=>{if(!(ch in init))init[ch]=null})});
+    // 날짜 숫자: 칸 오른쪽에 있는 숫자
+    const isNum=t=>/^\d{1,2}$/.test(t)||/^\d{1,2}[./]\d{1,2}$/.test(t);
+    const heads=ws.filter(w=>w.top>headTop+4&&isNum(w.t)&&col(w.x)>=0&&(w.x-cen[col(w.x)])>sp*.15);
+    const bands=[];heads.map(h=>h.top).sort((a,b)=>a-b).forEach(t=>{if(!bands.length||t-bands[bands.length-1]>6)bands.push(t)});
+    const cells=heads.map(h=>({h,c:col(h.x),band:bands.findIndex(b=>Math.abs(b-h.top)<=6)})).sort((a,b)=>a.band-b.band||a.c-b.c);
+    for(const {h,c,band} of cells){
+      const top=bands[band]-3,bot=band+1<bands.length?bands[band+1]-3:1e9;
+      // 날짜 계산
+      let d,mo=month;const md=h.t.match(/^(\d{1,2})[./](\d{1,2})$/);
+      if(md){mo=+md[1];d=+md[2]}else{d=+h.t;if(mo==null){const yy=ws.find(w=>/^\d{1,2}\/$/.test(w.t));mo=yy?+yy.t.slice(0,-1):null}if(mo!=null&&d<prevDay)mo=mo%12+1}
+      if(month!=null&&mo<month&&year)year++;
+      month=mo;prevDay=d;
+      const iso=year&&mo?`${year}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`:'';
+      // 칸 안 줄 묶기
+      const cw=ws.filter(w=>w!==h&&col(w.x)===c&&w.top>=top&&w.top<bot);
+      const lines=[];for(const w of cw.sort((a,b)=>a.top-b.top)){let L=lines.find(l=>Math.abs(l.top-w.top)<3.2);if(!L){L={top:w.top,ws:[]};lines.push(L)}L.ws.push(w)}
+      const notes=[],rows=[];
+      for(const L of lines.sort((a,b)=>a.top-b.top)){const toks=L.ws.sort((a,b)=>a.x-b.x).map(w=>w.t);
+        if(Math.abs(L.top-h.top)<4){notes.push(...toks.filter(t=>!/^20\d\d\.?$/.test(t)&&!/^\d{1,2}\/$/.test(t)).map(t=>t.replace(/^\d{1,2}\//,'')).filter(Boolean));continue}
+        if(!CAL.SC.test(toks[0])){if(rows.length&&!/^\d+\/\d+$/.test(toks.join('')))rows[rows.length-1].title+=(rows[rows.length-1].title?' ':'')+toks.join(' ');continue}
+        const sc=toks[0].replace(/^S?#/,'');const rest=toks.slice(1);const di=rest.findIndex(t=>CAL.DN.test(t));
+        let place=di>=0?rest.slice(0,di):rest,after=di>=0?rest.slice(di+1):[];const cast=[];
+        while(after.length>1&&[...after[after.length-1]].every(ch=>ch in init)){cast.unshift(...after.pop())}
+        rows.push({sc,place:place.join(' '),dn:di>=0?rest[di].toUpperCase().slice(0,1):'',title:after.join(' '),cast:cast.map(ch=>init[ch]).filter(Boolean)});
+      }
+      days.push({label:h.t,iso,notes:notes.join(' ').trim(),rows});
+    }
+  }
+  return days;
+};
+/* 촬영 캘린더 다시 올리기 → 회차 전체 맞추기 (제작부) */
+let calPending=null;
+const calPlaces=sch=>[...new Set(sch.filter(x=>!x.brk&&x.set).map(x=>x.set))];
+const calLoc=sch=>{const p=calPlaces(sch);return p.length>3?p.slice(0,3).join(', ')+` 외 ${p.length-3}곳`:p.join(', ')};
+const calKey=x=>[x.sc,x.set||'',x.dn||'',x.d||'',(x.cast||[]).join(',')].join('|');
+function calPlan(cal,dropMissing){
+  const shoot=cal.filter(d=>d.rows.length&&d.iso).sort((a,b)=>a.iso<b.iso?-1:a.iso>b.iso?1:0);
+  const byIso={};P.list.forEach(([n])=>{const d=ensureDay(n);if(d.iso&&!(d.iso in byIso))byIso[d.iso]=n});
+  const oldSc={};P.list.forEach(([n])=>(P.days[n].sch||[]).forEach(x=>{if(x.sc&&!x.brk&&!oldSc[x.sc])oldSc[x.sc]=x}));
+  const out=[],used=new Set(),chg=[];
+  for(const c of shoot){
+    const sch=c.rows.map(r=>{const sc='S#'+r.sc,o=oldSc[sc]||{};return {...o,sc,dn:r.dn||o.dn||'',set:r.place||o.set||'',d:r.title||o.d||'',cast:r.cast,notes:o.notes||{}}});
+    const n=byIso[c.iso];
+    if(n!=null&&!used.has(n)){used.add(n);const od=P.days[n];const oldRows=(od.sch||[]).filter(x=>!x.brk);
+      const same=oldRows.length===sch.length&&oldRows.every((x,i)=>calKey(x)===calKey(sch[i]));
+      const d={...od};
+      if(!same){d.sch=sch;if(!od.loc||od.loc===calLoc(od.sch||[]))d.loc=calLoc(sch);if(!od.q||calPlaces(od.sch||[]).includes(od.q))d.q=calPlaces(sch)[0]||od.q||''}
+      if(c.notes){d.prep=c.notes;d.info=(od.info||[]).filter(x=>x[0]!=='준비').concat([['준비',c.notes]])}
+      if(!same){d.info=(d.info||[]).filter(x=>x[0]!=='장소');d.info.unshift(['장소',calPlaces(sch).join(', ')])}
+      const os=new Set(oldRows.map(x=>x.sc)),ns=new Set(sch.map(x=>x.sc));
+      const what=[];if(!same){const om={};oldRows.forEach(x=>om[x.sc]=x);const both=sch.filter(x=>om[x.sc]);
+        if(both.some(x=>(om[x.sc].cast||[]).join()!==(x.cast||[]).join()))what.push('출연');if(both.some(x=>(om[x.sc].set||'')!==x.set))what.push('장소');
+        if(both.some(x=>(om[x.sc].dn||'')!==x.dn))what.push('D/N');if(both.some(x=>(om[x.sc].d||'')!==x.d))what.push('씬 제목');
+        const oo=oldRows.map(x=>x.sc).filter(s=>ns.has(s)),no=sch.map(x=>x.sc).filter(s=>os.has(s));if(oo.join()!==no.join())what.push('순서')}
+      out.push({old:n,d,same});if(!same)chg.push({kind:'chg',iso:c.iso,n,add:[...ns].filter(s=>!os.has(s)),del:[...os].filter(s=>!ns.has(s)),what,cnt:sch.length});
+    }else{
+      const d={date:isoLbl(c.iso),iso:c.iso,loc:calLoc(sch),prep:c.notes||'',calls:{},notes:{},info:[['장소',calPlaces(sch).join(', ')]].concat(c.notes?[['준비',c.notes]]:[]),q:calPlaces(sch)[0]||'',sch};
+      out.push({old:null,d,same:false});chg.push({kind:'add',iso:c.iso,cnt:sch.length});
+    }
+  }
+  const missing=P.list.map(x=>x[0]).filter(n=>!used.has(n));
+  missing.forEach(n=>{if(!dropMissing){out.push({old:n,d:P.days[n],same:true})}});
+  out.sort((a,b)=>{const x=a.d.iso||'9999',y=b.d.iso||'9999';return x<y?-1:x>y?1:0});
+  return {out,chg,missing,shoot};
+}
+async function calImport(f,doc){
+  const cal=await CAL.read(doc,P.roles);
+  const n=cal.filter(d=>d.rows.length&&d.iso).length;
+  if(n<2)return false;
+  calPending={cal,name:f.name};showCalPreview();return true;
+}
+function showCalPreview(){
+  const {cal,name}=calPending;const drop=calPending.drop!==false;const pl=calPlan(cal,drop);
+  const sc=pl.shoot.reduce((a,d)=>a+d.rows.length,0);
+  const md=iso=>{const [,m,d]=iso.split('-');return `${+m}/${+d}`};
+  const li=[];
+  pl.chg.forEach(c=>{if(c.kind==='add')li.push(`<li class="ca" data-iso="${c.iso}"><b>${md(c.iso)}</b> 새 촬영일 · 씬 ${c.cnt}개</li>`);
+    else li.push(`<li class="cc" data-iso="${c.iso}"><b>${md(c.iso)}</b> 씬 바뀜${c.add.length?` · 추가 ${esc(c.add.map(s=>s.replace('S#','')).join(', '))}`:''}${c.del.length?` · 빠짐 ${esc(c.del.map(s=>s.replace('S#','')).join(', '))}`:''}${c.what.length?` · ${c.what.join('·')} 수정`:''}</li>`)});
+  pl.missing.forEach(n=>{const d=P.days[n];li.push(`<li class="cd" data-iso="${esc(d.iso||'9999')}"><b>${esc(d.iso?md(d.iso):d.date||'날짜 없음')}</b> ${n}회차 · 캘린더에 없음${drop?' · 지워져요':' · 그대로 둬요'}</li>`)});
+  li.sort((a,b)=>{const x=a.match(/data-iso="([^"]*)"/)[1],y=b.match(/data-iso="([^"]*)"/)[1];return x<y?-1:x>y?1:0});
+  const same=pl.out.filter(o=>o.same&&o.old!=null&&!pl.missing.includes(o.old)).length;
+  openSheet('촬영 캘린더 맞추기',`<p style="margin:0">${esc(name)}에서 <b>촬영일 ${pl.shoot.length}일, 씬 ${sc}개</b>를 찾았어요.</p>
+  ${li.length?`<ul class="calchg">${li.join('')}</ul>`:'<p class="hint">지금 회차표와 똑같아요. 바뀐 게 없어요.</p>'}
+  ${same?`<p class="hint">그대로인 촬영일 ${same}일은 콜타임·메모·체크까지 손대지 않아요.</p>`:''}
+  ${pl.chg.some(c=>c.kind==='chg')?'<p class="hint">씬이 바뀐 날은 씬 메모는 씬 번호를 따라가고, 시간표의 이동·식사 줄은 다시 확인해 주세요.</p>':''}
+  ${pl.missing.length?`<label class="upo"><input type="checkbox" id="calDrop"${drop?' checked':''}><span>캘린더에 없는 회차 ${pl.missing.length}개 지우기</span></label>`:''}
+  ${li.length?`<button class="btn pri go" id="calGo" style="width:100%">캘린더대로 바꾸기</button>`:''}`);
+  const cb=$('calDrop');if(cb)cb.addEventListener('change',()=>{calPending.drop=cb.checked;showCalPreview()});
+  const go=$('calGo');if(go)go.addEventListener('click',async()=>{go.disabled=true;go.textContent='바꾸는 중…';if(await calApply())closeSheet();else{go.disabled=false;go.textContent='캘린더대로 바꾸기'}});
+}
+async function calApply(){
+  const {cal}=calPending;const pl=calPlan(cal,calPending.drop!==false);
+  const bak={days:P.days,list:JSON.stringify(P.list),done:doneBy,delay:delayBy,day};
+  const map={},days={},done={},delay={},fix=[];
+  pl.out.forEach((o,i)=>{const nn=i+1;days[nn]=o.d;
+    if(o.old==null)return;
+    if(o.same){map[o.old]=nn;if(doneBy[o.old])done[nn]=doneBy[o.old];if(delayBy[o.old])delay[nn]=delayBy[o.old];return}
+    // 씬이 바뀐 날: 완료 체크는 씬 번호 따라 옮기기
+    const os=P.days[o.old].sch||[],mark=new Set([...(doneBy[o.old]||[])].map(i=>os[i]&&os[i].sc).filter(Boolean));
+    const nd=new Set();o.d.sch.forEach((x,i)=>{if(mark.has(x.sc))nd.add(i)});
+    if(nd.size||delayBy[o.old]){done[nn]=nd;delay[nn]=delayBy[o.old]||0;fix.push(nn)}
+  });
+  P.days=days;doneBy=done;delayBy=delay;P.list=[];Object.keys(days).forEach(k=>syncList(+k));
+  const oldDayIso=bak.days[bak.day]&&bak.days[bak.day].iso;
+  const ok=await withAdmin(async()=>{saving=true;try{await rpc('barasi_reorder_days',{p_token:token,p_map:map,p_days:days,p_meta:{roles:P.roles,crew:P.crew||[],list:P.list}})}finally{saving=false}});
+  if(!ok){P.days=bak.days;P.list=JSON.parse(bak.list);doneBy=bak.done;delayBy=bak.delay;day=bak.day;return false}
+  for(const nn of fix){try{await rpc('barasi_set_state',{p_token:token,p_day:nn,p_done:[...done[nn]],p_delay:delay[nn]||0})}catch(e){}}
+  const keep=Object.keys(days).find(k=>days[k].iso&&days[k].iso===oldDayIso);
+  day=keep?+keep:Math.min(bak.day,Object.keys(days).length)||1;openRow=-1;rerender();
+  const a=pl.chg.filter(c=>c.kind==='add').length,c=pl.chg.filter(c=>c.kind==='chg').length,r=calPending.drop!==false?pl.missing.length:0;
+  toast(`캘린더대로 맞췄어요.${a?` 새 촬영일 ${a}`:''}${c?` · 바뀐 날 ${c}`:''}${r?` · 지운 회차 ${r}`:''}`);
+  calPending=null;return true;
+}
 /* 시간표 파일 → 회차 (제작부) */
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('라이브러리를 불러오지 못했어요'));document.head.appendChild(s)});
 async function readTimetable(f,onProg){
@@ -1467,7 +1621,11 @@ async function importTT(f){
   if(!admOK()&&!(await askAdmin()))return;
   openSheet('시간표 읽는 중',`<p>${esc(f.name)}을(를) 읽고 있어요…</p>`);
   try{
-    const lines=await readTimetable(f);const res=TT.interpret(lines);
+    let lines;
+    if(/\.pdf$/i.test(f.name)||f.type==='application/pdf'){const lib=await loadPdfjs();const doc=await lib.getDocument({data:new Uint8Array(await f.arrayBuffer()),cMapUrl:PDFJS+'cmaps/',cMapPacked:true,standardFontDataUrl:PDFJS+'standard_fonts/'}).promise;
+      if(await calImport(f,doc))return;lines=await TT.fromPdf(doc)}
+    else lines=await readTimetable(f);
+    const res=TT.interpret(lines);
     if(!res.rows.filter(r=>r.c).length&&!res.tt.length){openSheet('시간표 올리기',`<p>이 파일에서 시간표 칸(시간, 씬, 장소, 출연 같은 제목 줄)을 찾지 못했어요.</p><p class="hint">콘티나 구성안이라면 자료 탭의 <b>콘티 올리기</b>로 올려주세요.</p>`);return}
     const out=TT.toDay(res,P.roles);ttPending={out,res,name:f.name};showTTPreview();
   }catch(err){openSheet('시간표 올리기',`<p>${esc(err.user?err.message:'파일을 읽지 못했어요. 엑셀, PPT, PDF 시간표가 맞는지 확인해 주세요.')}</p>${err.user?'':`<p class="hint">${esc(String(err&&err.message||err))}</p>`}`)}
@@ -1702,7 +1860,7 @@ function install(){
     :'<p>크롬 오른쪽 위 <b>메뉴(점 세 개)</b>를 누르고 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 고르면 설치돼요.</p>');
 }
 // 새 버전이 올라오면 앱을 열 때 알아서 새로고침 (홈 화면 앱이 옛 화면에 멈춰 있지 않게)
-const APP_VER='barasi-v18';
+const APP_VER='barasi-v19';
 async function checkVer(){
   try{const t=await fetch('sw.js?t='+Date.now(),{cache:'no-store'}).then(r=>r.text());const v=(t.match(/VERSION\s*=\s*'([^']+)'/)||[])[1];
     if(!v||v===APP_VER||sessionStorage.getItem('barasi_reload')===v)return;
