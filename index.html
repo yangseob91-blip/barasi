@@ -1534,14 +1534,12 @@ function calPlan(cal,dropMissing){
   const oldSc={};P.list.forEach(([n])=>(P.days[n].sch||[]).forEach(x=>{if(x.sc&&!x.brk&&!oldSc[x.sc])oldSc[x.sc]=x}));
   const out=[],used=new Set(),chg=[];
   for(const c of shoot){
-    const sch=c.rows.map(r=>{const sc='S#'+r.sc,o=oldSc[sc]||{};return {...o,sc,dn:r.dn||o.dn||'',set:r.place||o.set||'',d:r.title||o.d||'',cast:r.cast,notes:o.notes||{}}});
+    const sch=c.rows.map(r=>({sc:'S#'+r.sc,code:'',dn:r.dn||'',set:r.place||'',d:r.title||'',cast:r.cast,notes:{}}));
+    const fresh={date:isoLbl(c.iso),iso:c.iso,loc:calLoc(sch),prep:c.notes||'',calls:{},notes:{},info:[['장소',calPlaces(sch).join(', ')]].concat(c.notes?[['준비',c.notes]]:[]),q:calPlaces(sch)[0]||'',sch};
     const n=byIso[c.iso];
     if(n!=null&&!used.has(n)){used.add(n);const od=P.days[n];const oldRows=(od.sch||[]).filter(x=>!x.brk);
       const same=oldRows.length===sch.length&&oldRows.every((x,i)=>calKey(x)===calKey(sch[i]));
-      const d={...od};
-      if(!same){d.sch=sch;if(!od.loc||od.loc===calLoc(od.sch||[]))d.loc=calLoc(sch);if(!od.q||calPlaces(od.sch||[]).includes(od.q))d.q=calPlaces(sch)[0]||od.q||''}
-      if(c.notes){d.prep=c.notes;d.info=(od.info||[]).filter(x=>x[0]!=='준비').concat([['준비',c.notes]])}
-      if(!same){d.info=(d.info||[]).filter(x=>x[0]!=='장소');d.info.unshift(['장소',calPlaces(sch).join(', ')])}
+      const d=fresh;
       const os=new Set(oldRows.map(x=>x.sc)),ns=new Set(sch.map(x=>x.sc));
       const what=[];if(!same){const om={};oldRows.forEach(x=>om[x.sc]=x);const both=sch.filter(x=>om[x.sc]);
         if(both.some(x=>(om[x.sc].cast||[]).join()!==(x.cast||[]).join()))what.push('출연');if(both.some(x=>(om[x.sc].set||'')!==x.set))what.push('장소');
@@ -1549,7 +1547,7 @@ function calPlan(cal,dropMissing){
         const oo=oldRows.map(x=>x.sc).filter(s=>ns.has(s)),no=sch.map(x=>x.sc).filter(s=>os.has(s));if(oo.join()!==no.join())what.push('순서')}
       out.push({old:n,d,same});if(!same)chg.push({kind:'chg',iso:c.iso,n,add:[...ns].filter(s=>!os.has(s)),del:[...os].filter(s=>!ns.has(s)),what,cnt:sch.length});
     }else{
-      const d={date:isoLbl(c.iso),iso:c.iso,loc:calLoc(sch),prep:c.notes||'',calls:{},notes:{},info:[['장소',calPlaces(sch).join(', ')]].concat(c.notes?[['준비',c.notes]]:[]),q:calPlaces(sch)[0]||'',sch};
+      const d=fresh;
       out.push({old:null,d,same:false});chg.push({kind:'add',iso:c.iso,cnt:sch.length});
     }
   }
@@ -1565,7 +1563,7 @@ async function calImport(f,doc){
   calPending={cal,name:f.name};showCalPreview();return true;
 }
 function showCalPreview(){
-  const {cal,name}=calPending;const drop=calPending.drop!==false;const pl=calPlan(cal,drop);
+  const {cal,name}=calPending;const drop=true;const pl=calPlan(cal,true);
   const sc=pl.shoot.reduce((a,d)=>a+d.rows.length,0);
   const md=iso=>{const [,m,d]=iso.split('-');return `${+m}/${+d}`};
   const li=[];
@@ -1573,28 +1571,18 @@ function showCalPreview(){
     else li.push(`<li class="cc" data-iso="${c.iso}"><b>${md(c.iso)}</b> 씬 바뀜${c.add.length?` · 추가 ${esc(c.add.map(s=>s.replace('S#','')).join(', '))}`:''}${c.del.length?` · 빠짐 ${esc(c.del.map(s=>s.replace('S#','')).join(', '))}`:''}${c.what.length?` · ${c.what.join('·')} 수정`:''}</li>`)});
   pl.missing.forEach(n=>{const d=P.days[n];li.push(`<li class="cd" data-iso="${esc(d.iso||'9999')}"><b>${esc(d.iso?md(d.iso):d.date||'날짜 없음')}</b> ${n}회차 · 캘린더에 없음${drop?' · 지워져요':' · 그대로 둬요'}</li>`)});
   li.sort((a,b)=>{const x=a.match(/data-iso="([^"]*)"/)[1],y=b.match(/data-iso="([^"]*)"/)[1];return x<y?-1:x>y?1:0});
-  const same=pl.out.filter(o=>o.same&&o.old!=null&&!pl.missing.includes(o.old)).length;
+  const cur=P.list.length;
   openSheet('촬영 캘린더 맞추기',`<p style="margin:0">${esc(name)}에서 <b>촬영일 ${pl.shoot.length}일, 씬 ${sc}개</b>를 찾았어요.</p>
-  ${li.length?`<ul class="calchg">${li.join('')}</ul>`:'<p class="hint">지금 회차표와 똑같아요. 바뀐 게 없어요.</p>'}
-  ${same?`<p class="hint">그대로인 촬영일 ${same}일은 콜타임·메모·체크까지 손대지 않아요.</p>`:''}
-  ${pl.chg.some(c=>c.kind==='chg')?'<p class="hint">씬이 바뀐 날은 씬 메모는 씬 번호를 따라가고, 시간표의 이동·식사 줄은 다시 확인해 주세요.</p>':''}
-  ${pl.missing.length?`<label class="upo"><input type="checkbox" id="calDrop"${drop?' checked':''}><span>캘린더에 없는 회차 ${pl.missing.length}개 지우기</span></label>`:''}
-  ${li.length?`<button class="btn pri go" id="calGo" style="width:100%">캘린더대로 바꾸기</button>`:''}`);
-  const cb=$('calDrop');if(cb)cb.addEventListener('change',()=>{calPending.drop=cb.checked;showCalPreview()});
-  const go=$('calGo');if(go)go.addEventListener('click',async()=>{go.disabled=true;go.textContent='바꾸는 중…';if(await calApply())closeSheet();else{go.disabled=false;go.textContent='캘린더대로 바꾸기'}});
+  ${li.length?`<p class="hint" style="margin:10px 0 0">지난번과 달라진 곳</p><ul class="calchg">${li.join('')}</ul>`:'<p class="hint">지난번과 달라진 곳은 없어요.</p>'}
+  <p class="hint">지금 회차 ${cur}개를 모두 지우고, 이 캘린더대로 ${pl.shoot.length}개 회차를 새로 만들어요. 손으로 넣은 콜타임·메모·완료 체크도 함께 지워져요.</p>
+  <button class="btn pri go" id="calGo" style="width:100%">이 캘린더로 새로 만들기</button>`);
+  const go=$('calGo');if(go)go.addEventListener('click',async()=>{go.disabled=true;go.textContent='바꾸는 중…';if(await calApply())closeSheet();else{go.disabled=false;go.textContent='이 캘린더로 새로 만들기'}});
 }
 async function calApply(){
-  const {cal}=calPending;const pl=calPlan(cal,calPending.drop!==false);
+  const {cal}=calPending;const pl=calPlan(cal,true);
   const bak={days:P.days,list:JSON.stringify(P.list),done:doneBy,delay:delayBy,day};
   const map={},days={},done={},delay={},fix=[];
-  pl.out.forEach((o,i)=>{const nn=i+1;days[nn]=o.d;
-    if(o.old==null)return;
-    if(o.same){map[o.old]=nn;if(doneBy[o.old])done[nn]=doneBy[o.old];if(delayBy[o.old])delay[nn]=delayBy[o.old];return}
-    // 씬이 바뀐 날: 완료 체크는 씬 번호 따라 옮기기
-    const os=P.days[o.old].sch||[],mark=new Set([...(doneBy[o.old]||[])].map(i=>os[i]&&os[i].sc).filter(Boolean));
-    const nd=new Set();o.d.sch.forEach((x,i)=>{if(mark.has(x.sc))nd.add(i)});
-    if(nd.size||delayBy[o.old]){done[nn]=nd;delay[nn]=delayBy[o.old]||0;fix.push(nn)}
-  });
+  pl.out.forEach((o,i)=>{days[i+1]=o.d});
   P.days=days;doneBy=done;delayBy=delay;P.list=[];Object.keys(days).forEach(k=>syncList(+k));
   const oldDayIso=bak.days[bak.day]&&bak.days[bak.day].iso;
   const ok=await withAdmin(async()=>{saving=true;try{await rpc('barasi_reorder_days',{p_token:token,p_map:map,p_days:days,p_meta:{roles:P.roles,crew:P.crew||[],list:P.list}})}finally{saving=false}});
@@ -1602,8 +1590,7 @@ async function calApply(){
   for(const nn of fix){try{await rpc('barasi_set_state',{p_token:token,p_day:nn,p_done:[...done[nn]],p_delay:delay[nn]||0})}catch(e){}}
   const keep=Object.keys(days).find(k=>days[k].iso&&days[k].iso===oldDayIso);
   day=keep?+keep:Math.min(bak.day,Object.keys(days).length)||1;openRow=-1;rerender();
-  const a=pl.chg.filter(c=>c.kind==='add').length,c=pl.chg.filter(c=>c.kind==='chg').length,r=calPending.drop!==false?pl.missing.length:0;
-  toast(`캘린더대로 맞췄어요.${a?` 새 촬영일 ${a}`:''}${c?` · 바뀐 날 ${c}`:''}${r?` · 지운 회차 ${r}`:''}`);
+  toast(`캘린더대로 ${Object.keys(days).length}개 회차를 새로 만들었어요.`);
   calPending=null;return true;
 }
 /* 시간표 파일 → 회차 (제작부) */
@@ -1860,7 +1847,7 @@ function install(){
     :'<p>크롬 오른쪽 위 <b>메뉴(점 세 개)</b>를 누르고 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 고르면 설치돼요.</p>');
 }
 // 새 버전이 올라오면 앱을 열 때 알아서 새로고침 (홈 화면 앱이 옛 화면에 멈춰 있지 않게)
-const APP_VER='barasi-v19';
+const APP_VER='barasi-v20';
 async function checkVer(){
   try{const t=await fetch('sw.js?t='+Date.now(),{cache:'no-store'}).then(r=>r.text());const v=(t.match(/VERSION\s*=\s*'([^']+)'/)||[])[1];
     if(!v||v===APP_VER||sessionStorage.getItem('barasi_reload')===v)return;
