@@ -1,6 +1,6 @@
 // 바라시 서비스 워커: 앱 껍데기는 캐시에서 바로 띄우고, 새 버전은 뒤에서 받아둔다.
 // 화면을 고친 뒤 배포할 때는 VERSION 숫자만 올리면 된다.
-const VERSION = 'barasi-v14';
+const VERSION = 'barasi-v15';
 const SHELL = [
   './',
   './index.html',
@@ -12,7 +12,7 @@ const SHELL = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -33,7 +33,7 @@ self.addEventListener('fetch', e => {
   // 페이지: 네트워크 우선, 신호 없으면 캐시 (산속 로케에서도 마지막 콜시트가 보이게)
   if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req)
+      fetch(req.url, { cache: 'no-store', credentials: 'same-origin' })
         .then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return res; })
         .catch(() => caches.match('./index.html'))
     );
